@@ -1,0 +1,7 @@
+{
+  "name": "marketpet",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>MarketPet</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding ion-text-center">
+  <h1>Bienvenido a MarketPet</h1>
+  <p>Tu marketplace para productos y servicios de mascotas.</p>
+
+  <ion-button expand="block" color="secondary" [routerLink]="['/login']">
+    Iniciar Sesión
+  </ion-button>
+
+  <ion-button expand="block" color="tertiary" [routerLink]="['/registro']">
+    Registrarse
+  </ion-button>
+
+  <ion-button expand="block" color="success" [routerLink]="['/feed']">
+    Ver Marketplace
+  </ion-button>
+</ion-content>
+
