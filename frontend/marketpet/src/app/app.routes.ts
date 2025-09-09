@@ -30,4 +30,5 @@ export const routes: Routes = [
     path: 'feed',
     loadComponent: () => import('./feed/feed.page').then( m => m.FeedPage)
   },
+
 ];
