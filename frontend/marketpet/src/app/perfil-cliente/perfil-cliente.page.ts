@@ -13,6 +13,7 @@ interface Mascota {
   personalidad: string;
   vacunas: string[];
   vacunasString?: string;
+  condicion: string;
   foto: string;
 }
 
@@ -37,6 +38,7 @@ export class PerfilClientePage {
       personalidad: 'Juguetón',
       vacunas: ['Rabia', 'Moquillo'],
       vacunasString: 'Rabia, Moquillo',
+      condicion: 'Diabetes',
       foto: 'https://via.placeholder.com/150',
     },
   ];
@@ -56,6 +58,7 @@ export class PerfilClientePage {
       personalidad: '',
       vacunas: [],
       vacunasString: '',
+      condicion: '',
       foto: '',
     });
   }

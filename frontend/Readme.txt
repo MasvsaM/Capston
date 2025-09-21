@@ -106,4 +106,12 @@ marketpet/
 ├─ package.json
 ├─ README.md
 └─ ...
+   
 
+
+Generar un scoring con las fichas de las personas y el animal, 
+poner el chip,
+al incluirlo se hace la ficha del animal y en caso de un contratiempo o denuncia queda en la hoja de vida del dueño.
+
+
+¿euq habilidades, conocimientos o experiencias me gustaria fortalecer?
