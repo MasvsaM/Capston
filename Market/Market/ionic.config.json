@@ -1,0 +1,7 @@
+{
+  "name": "Market",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
