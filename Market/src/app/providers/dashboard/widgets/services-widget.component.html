@@ -1,0 +1,25 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Servicios ofrecidos</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-list lines="none" *ngIf="services.length > 0; else emptyServices">
+      <ion-item *ngFor="let service of services">
+        <ion-icon slot="start" [icon]="listCircleOutline"></ion-icon>
+        <ion-label>
+          <h3>{{ service }}</h3>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ng-template #emptyServices>
+      <p class="empty-message">
+        Todavía no has configurado los servicios que ofreces. ¡Hazlo ahora para mostrarlos a tus clientes!
+      </p>
+      <ion-button expand="block" color="primary">
+        <ion-icon slot="start" [icon]="settingsOutline"></ion-icon>
+        Configurar servicios
+      </ion-button>
+    </ng-template>
+  </ion-card-content>
+</ion-card>
