@@ -5,7 +5,11 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+
+  <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" class="registro-form">
+
   <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+ main
     <ion-item>
       <ion-label>Rol</ion-label>
       <ion-segment formControlName="role">
@@ -15,18 +19,30 @@
     </ion-item>
 
     <!-- Campo dinámico según rol -->
+
+    <ion-item *ngIf="isProveedor()">
+
     <ion-item *ngIf="registroForm.get('role')?.value === 'proveedor'">
+main
       <ion-label position="floating">Nombre o Razón Social</ion-label>
       <ion-input formControlName="nombre"></ion-input>
     </ion-item>
 
+
+    <ion-item *ngIf="!isProveedor()">
+
     <ion-item *ngIf="registroForm.get('role')?.value === 'cliente'">
+main
       <ion-label position="floating">Nombre</ion-label>
       <ion-input formControlName="nombre"></ion-input>
     </ion-item>
 
     <!-- RUT solo para proveedores -->
+
+    <ion-item *ngIf="isProveedor()">
+
     <ion-item *ngIf="registroForm.get('role')?.value === 'proveedor'">
+main
       <ion-label position="floating">RUT</ion-label>
       <ion-input formControlName="rut"></ion-input>
     </ion-item>
@@ -51,7 +67,91 @@
       <ion-input type="password" formControlName="password"></ion-input>
     </ion-item>
 
+
+    <section *ngIf="isProveedor()" class="survey">
+      <h2>Servicios que ofreces</h2>
+      <p class="survey__description">
+        Selecciona los servicios que entregarás y completa los detalles para personalizar tu dashboard.
+      </p>
+
+      <ion-list class="survey__options">
+        <ion-item *ngFor="let option of serviceOptions" lines="none" class="survey__option">
+          <ion-icon slot="start" [name]="option.icon" color="primary"></ion-icon>
+          <ion-label>
+            <h3>{{ option.title }}</h3>
+            <p>{{ option.description }}</p>
+          </ion-label>
+          <ion-checkbox
+            slot="end"
+            [checked]="isServiceSelected(option.id)"
+            (ionChange)="toggleService(option, $event.detail.checked)"
+            aria-label="Seleccionar servicio {{ option.title }}"
+          ></ion-checkbox>
+        </ion-item>
+      </ion-list>
+
+      <ion-text color="danger" *ngIf="submitted() && servicios.errors?.['required']">
+        <p class="error-text">Selecciona al menos un servicio para continuar.</p>
+      </ion-text>
+
+      <div formArrayName="services" class="survey__details">
+        <ion-card *ngFor="let servicio of servicios.controls; let i = index" [formGroupName]="i">
+          <ion-card-header>
+            <ion-card-title>{{ servicio.get('name')?.value }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label position="stacked">Modalidad principal</ion-label>
+              <ion-select formControlName="modalidad" interface="popover">
+                <ion-select-option *ngFor="let modalidad of modalidadesPara(servicio.get('id')?.value)" [value]="modalidad">
+                  {{ modalidad }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-text color="danger" *ngIf="submitted() && servicio.get('modalidad')?.invalid">
+              <p class="error-text">Indica la modalidad en que entregarás este servicio.</p>
+            </ion-text>
+
+            <ion-item>
+              <ion-label position="stacked">Precio base (CLP)</ion-label>
+              <ion-input type="number" formControlName="price" min="0"></ion-input>
+            </ion-item>
+            <ion-text color="danger" *ngIf="submitted() && servicio.get('price')?.invalid">
+              <p class="error-text">Define un valor de referencia mayor o igual a cero.</p>
+            </ion-text>
+
+            <ion-item>
+              <ion-label position="stacked">Mascotas que atiendes</ion-label>
+              <ion-select formControlName="animals" interface="popover" multiple="true">
+                <ion-select-option *ngFor="let animal of animalesDisponibles" [value]="animal">
+                  {{ animal }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Disponibilidad o bloque horario</ion-label>
+              <ion-input formControlName="schedule" placeholder="Ej: Lunes a Viernes 10:00 - 18:00"></ion-input>
+            </ion-item>
+            <ion-text color="danger" *ngIf="submitted() && servicio.get('schedule')?.invalid">
+              <p class="error-text">Comparte tu disponibilidad para mostrarla en el panel.</p>
+            </ion-text>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </section>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="saving()">
+      <ion-spinner *ngIf="saving()" slot="start"></ion-spinner>
+      {{ saving() ? 'Guardando…' : 'Registrarse' }}
+    </ion-button>
+
+    <ion-text color="danger" *ngIf="errorMessage()">
+      <p class="error-text">{{ errorMessage() }}</p>
+    </ion-text>
+
     <ion-button expand="block" type="submit" class="ion-margin-top">Registrarse</ion-button>
+ main
   </form>
 
   <div class="ion-text-center ion-margin-top">
