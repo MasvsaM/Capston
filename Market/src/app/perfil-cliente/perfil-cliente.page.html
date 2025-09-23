@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Perfil Cliente</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Toggle Premium -->
+  <ion-item>
+    <ion-label>Suscripción Premium</ion-label>
+    <ion-toggle [(ngModel)]="esPremium" (ionChange)="togglePremium()"></ion-toggle>
+  </ion-item>
+  <p *ngIf="esPremium" class="ion-text-success">¡Eres usuario Premium! Tu feed será personalizado y sin anuncios.</p>
+  <p *ngIf="!esPremium" class="ion-text-warning">Tu feed mostrará anuncios y recomendaciones menos personalizadas.</p>
+
+  <h2>Mis Mascotas</h2>
+
+  <ion-card *ngFor="let mascota of mascotas; let i = index">
+    <img [src]="mascota.foto || 'https://via.placeholder.com/150'" />
+    
+    <ion-card-header>
+      <ion-card-title>
+        <ion-input placeholder="Nombre" [(ngModel)]="mascota.nombre"></ion-input>
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="floating">Especie</ion-label>
+        <ion-input [(ngModel)]="mascota.especie"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Raza</ion-label>
+        <ion-input [(ngModel)]="mascota.raza"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Edad (años)</ion-label>
+        <ion-input type="number" [(ngModel)]="mascota.edad"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Peso (kg)</ion-label>
+        <ion-input type="number" [(ngModel)]="mascota.peso"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Sexo</ion-label>
+        <ion-segment [(ngModel)]="mascota.sexo">
+          <ion-segment-button value="Macho">Macho</ion-segment-button>
+          <ion-segment-button value="Hembra">Hembra</ion-segment-button>
+        </ion-segment>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Personalidad</ion-label>
+        <ion-input [(ngModel)]="mascota.personalidad"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Vacunas (separadas por coma)</ion-label>
+        <ion-input [(ngModel)]="mascota.vacunasString"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Condicion (¿tiene alguna condicion medica?)</ion-label>
+        <ion-input [(ngModel)]="mascota.condicion"></ion-input>
+      </ion-item>
+
+      <ion-button color="danger" expand="block" (click)="eliminarMascota(i)">Eliminar Mascota</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" (click)="agregarMascota()">Agregar Mascota</ion-button>
+</ion-content>
+
+
+

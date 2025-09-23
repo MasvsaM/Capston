@@ -2,29 +2,19 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-import * as dotenv from 'dotenv';
-import type { FirebaseOptions } from 'firebase/app';
-
-dotenv.config();
-
-const firebaseConfig: FirebaseOptions = {
-  apiKey: 'AIzaSyDajBLApflmVd7R06ami7NKdsrT0NDsfvo',
-  authDomain: 'marketpet-5bc0f.firebaseapp.com',
-  projectId: 'marketpet-5bc0f',
-  storageBucket: 'marketpet-5bc0f.firebasestorage.app',
-  messagingSenderId: '330809070804',
-  appId: '1:330809070804:web:8d3c92c58809a0e59b1741',
-  measurementId: 'G-PMGY8QNPEZ',
+export const environment = {
+  production: false,
+  firebase: {
+    apiKey: 'AIzaSyDajBLApflmVd7R06ami7NKdsrT0NDsfvo',
+    authDomain: 'marketpet-5bc0f.firebaseapp.com',
+    projectId: 'marketpet-5bc0f',
+    storageBucket: 'marketpet-5bc0f.firebasestorage.app',
+    messagingSenderId: '330809070804',
+    appId: '1:330809070804:web:8d3c92c58809a0e59b1741',
+    measurementId: 'G-PMGY8QNPEZ',
+  },
 };
 
-// Exporta la configuración de la aplicación
-export const environment = {
-  // Indica si la aplicación está en modo producción o no
-  production: false,
-  // Utiliza la variable de entorno API_URL para configurar la URL de la API
-  apiUrl: process.env.API_URL,
-  firebase: firebaseConfig,
-} as const;
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
