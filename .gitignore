@@ -1,0 +1,9 @@
+node_modules/
+Market/node_modules/
+Market/www/
+Market/.angular/
+Market/.firebase/
+Market/.tmp/
+.DS_Store
+npm-debug.log*
+

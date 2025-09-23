@@ -15,6 +15,8 @@ import { Router, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProviderDashboardService, ProviderProfile } from '../shared/services/provider-dashboard.service';
+import { FirebaseCrudService } from '../shared/services/firebase-crud.service';
+import { emailToDocumentId } from '../shared/utils/firestore-id.util';
 
 type UserRole = 'cliente' | 'proveedor';
 
@@ -54,6 +56,7 @@ export class RegistroPage {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dashboardService = inject(ProviderDashboardService);
+  private readonly firebaseCrud = inject(FirebaseCrudService);
 
   readonly serviceOptions: ServiceOption[] = [
     {
@@ -105,6 +108,8 @@ export class RegistroPage {
 
   readonly animalesDisponibles = ['Perros', 'Gatos', 'Aves', 'Pequeños mamíferos', 'Reptiles'];
   readonly submitted = signal(false);
+  readonly saving = signal(false);
+  readonly errorMessage = signal<string | null>(null);
 
   readonly registroForm = this.fb.group({
     role: this.fb.nonNullable.control<UserRole>('cliente', { validators: [Validators.required] }),
@@ -201,7 +206,7 @@ export class RegistroPage {
     }
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     this.submitted.set(true);
 
     if (this.isProveedor()) {
@@ -215,32 +220,55 @@ export class RegistroPage {
       return;
     }
 
-    const datos = this.registroForm.value;
-    console.log('Registro con:', datos);
+    const datos = this.registroForm.getRawValue();
 
-    if (datos.role === 'proveedor') {
-      const profile: ProviderProfile = {
-        name: datos.nombre ?? '',
-        email: datos.email ?? '',
-        telefono: datos.telefono ?? '',
+    this.errorMessage.set(null);
+    this.saving.set(true);
+
+    try {
+      if (!datos.email) {
+        throw new Error('El correo electrónico es obligatorio para completar el registro.');
+      }
+
+      if (datos.role === 'proveedor') {
+        const profile: ProviderProfile = {
+          name: datos.nombre ?? '',
+          email: datos.email,
+          telefono: datos.telefono ?? '',
+          direccion: datos.direccion ?? '',
+          rut: datos.rut ?? '',
+          services:
+            datos.services?.map(service => ({
+              id: service?.id ?? 'custom',
+              name: service?.name ?? 'Servicio personalizado',
+              modalidad: service?.modalidad ?? 'Sin definir',
+              price: Number(service?.price ?? 0),
+              animals: service?.animals ?? [],
+              schedule: service?.schedule ?? 'Coordinar con el cliente',
+            })) ?? [],
+        };
+
+        await this.dashboardService.saveProfile(profile);
+        void this.router.navigate(['/perfil-proveedor']);
+        return;
+      }
+
+      const customerId = emailToDocumentId(datos.email);
+
+      await this.firebaseCrud.setDocument('customers', customerId, {
+        nombre: datos.nombre ?? '',
         direccion: datos.direccion ?? '',
-        rut: datos.rut ?? '',
-        services:
-          datos.services?.map(service => ({
-            id: service?.id ?? 'custom',
-            name: service?.name ?? 'Servicio personalizado',
-            modalidad: service?.modalidad ?? 'Sin definir',
-            price: Number(service?.price ?? 0),
-            animals: service?.animals ?? [],
-            schedule: service?.schedule ?? 'Coordinar con el cliente',
-          })) ?? [],
-      };
+        telefono: datos.telefono ?? '',
+        email: datos.email,
+        role: datos.role ?? 'cliente',
+      });
 
-      this.dashboardService.setProfile(profile);
-      void this.router.navigate(['/perfil-proveedor']);
-      return;
+      void this.router.navigate(['/perfil-cliente']);
+    } catch (error) {
+      console.error('Error durante el registro', error);
+      this.errorMessage.set('No pudimos guardar tus datos. Inténtalo nuevamente en unos minutos.');
+    } finally {
+      this.saving.set(false);
     }
-
-    void this.router.navigate(['/perfil-cliente']);
   }
 }

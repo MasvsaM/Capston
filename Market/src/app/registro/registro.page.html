@@ -124,7 +124,14 @@
       </div>
     </section>
 
-    <ion-button expand="block" type="submit" class="ion-margin-top">Registrarse</ion-button>
+    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="saving()">
+      <ion-spinner *ngIf="saving()" slot="start"></ion-spinner>
+      {{ saving() ? 'Guardando…' : 'Registrarse' }}
+    </ion-button>
+
+    <ion-text color="danger" *ngIf="errorMessage()">
+      <p class="error-text">{{ errorMessage() }}</p>
+    </ion-text>
   </form>
 
   <div class="ion-text-center ion-margin-top">

@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, OnDestroy, inject } from '@angular/core';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { FirebaseCrudService } from './firebase-crud.service';
+import { emailToDocumentId } from '../utils/firestore-id.util';
 
 export interface ProviderServiceOffering {
   id: string;
@@ -10,12 +12,15 @@ export interface ProviderServiceOffering {
   schedule: string;
 }
 
-export interface ProviderProfile {
+export interface ProviderProfile extends Record<string, unknown> {
   name: string;
   email: string;
   telefono: string;
   direccion: string;
   rut?: string | null;
+  id?: string;
+  createdAt?: number;
+  updatedAt?: number;
   services: ProviderServiceOffering[];
 }
 
@@ -35,8 +40,12 @@ export interface DashboardWidget {
 }
 
 @Injectable({ providedIn: 'root' })
-export class ProviderDashboardService {
+export class ProviderDashboardService implements OnDestroy {
   private readonly profileSubject = new BehaviorSubject<ProviderProfile | null>(null);
+  private readonly crud = inject(FirebaseCrudService);
+  private readonly collectionPath = 'providers';
+  private readonly storageKey = 'market:last-provider-id';
+  private profileSubscription: Subscription | null = null;
 
   readonly profile$ = this.profileSubject.asObservable();
 
@@ -130,25 +139,139 @@ export class ProviderDashboardService {
     },
   ];
 
-  setProfile(profile: ProviderProfile): void {
-    const normalized: ProviderProfile = {
-      ...profile,
-      services: profile.services.map(service => ({
-        ...service,
-        animals: [...service.animals],
-        price: Number.isFinite(service.price) ? Number(service.price) : 0,
-      })),
-    };
+  constructor() {
+    void this.restoreStoredProfile();
+  }
 
-    this.profileSubject.next(normalized);
+  ngOnDestroy(): void {
+    this.profileSubscription?.unsubscribe();
+  }
+
+  async saveProfile(profile: ProviderProfile): Promise<string> {
+    if (!profile.email) {
+      throw new Error('El perfil de proveedor requiere un correo electrónico válido.');
+    }
+
+    const documentId = emailToDocumentId(profile.email);
+    const normalized = this.normalizeProfile({ ...profile, id: profile.id ?? documentId });
+
+    await this.crud.setDocument<ProviderProfile>(this.collectionPath, documentId, normalized);
+
+    this.listenToProfile(documentId);
+
+    return documentId;
+  }
+
+  loadProfile(id: string): void {
+    if (!id) {
+      return;
+    }
+
+    this.listenToProfile(id);
   }
 
   clearProfile(): void {
+    this.profileSubscription?.unsubscribe();
+    this.profileSubscription = null;
     this.profileSubject.next(null);
+    this.clearStoredProviderId();
+  }
+
+  async deleteProfile(id?: string): Promise<void> {
+    const targetId = id ?? this.currentProfile?.id;
+
+    if (!targetId) {
+      return;
+    }
+
+    await this.crud.deleteDocument(this.collectionPath, targetId);
+    this.clearProfile();
   }
 
   get currentProfile(): ProviderProfile | null {
     return this.profileSubject.value;
+  }
+
+  private async restoreStoredProfile(): Promise<void> {
+    const storedId = this.getStoredProviderId();
+
+    if (!storedId) {
+      return;
+    }
+
+    this.listenToProfile(storedId);
+  }
+
+  private listenToProfile(id: string): void {
+    this.profileSubscription?.unsubscribe();
+
+    this.profileSubscription = this.crud
+      .watchDocument<ProviderProfile>(this.collectionPath, id)
+      .subscribe({
+        next: profile => {
+          if (profile) {
+            this.profileSubject.next(this.normalizeProfile(profile));
+            this.storeProviderId(id);
+          } else {
+            this.profileSubject.next(null);
+            this.clearStoredProviderId();
+          }
+        },
+        error: error => {
+          console.error('Error al sincronizar el perfil de proveedor', error);
+          this.profileSubject.next(null);
+        },
+      });
+  }
+
+  private normalizeProfile(profile: ProviderProfile): ProviderProfile {
+    const services = Array.isArray(profile.services) ? profile.services : [];
+
+    return {
+      ...profile,
+      services: services.map(service => ({
+        ...service,
+        animals: Array.isArray(service.animals) ? [...service.animals] : [],
+        price: Number.isFinite(service.price) ? Number(service.price) : 0,
+      })),
+    };
+  }
+
+  private getStoredProviderId(): string | null {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    try {
+      return window.localStorage.getItem(this.storageKey);
+    } catch (error) {
+      console.warn('No fue posible leer el proveedor almacenado', error);
+      return null;
+    }
+  }
+
+  private storeProviderId(id: string): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(this.storageKey, id);
+    } catch (error) {
+      console.warn('No fue posible guardar el identificador del proveedor', error);
+    }
+  }
+
+  private clearStoredProviderId(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      window.localStorage.removeItem(this.storageKey);
+    } catch (error) {
+      console.warn('No fue posible limpiar el identificador del proveedor', error);
+    }
   }
 
   getWidgets(profile: ProviderProfile | null): DashboardWidget[] {
