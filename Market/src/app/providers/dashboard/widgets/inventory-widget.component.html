@@ -1,0 +1,35 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Gestión de productos</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-list lines="none" *ngIf="inventory.length > 0; else emptyInventory">
+      <ion-item *ngFor="let item of inventory; trackBy: trackById">
+        <ion-icon slot="start" [icon]="storefrontOutline"></ion-icon>
+        <ion-label>
+          <h3>{{ item.name }}</h3>
+          <p>Stock disponible</p>
+        </ion-label>
+        <ion-badge color="tertiary">{{ item.stock }}</ion-badge>
+        <ion-button slot="end" fill="clear" color="primary">
+          <ion-icon slot="icon-only" [icon]="createOutline"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-list>
+
+    <ng-template #emptyInventory>
+      <p class="empty-message">
+        Aún no tienes productos registrados. Empieza a construir tu inventario para hacer seguimiento.
+      </p>
+      <ion-button expand="block" color="primary">Crear producto</ion-button>
+    </ng-template>
+
+    <div class="widget-actions" *ngIf="inventory.length > 0">
+      <ion-button expand="block" color="primary">Ver inventario completo</ion-button>
+      <ion-button expand="block" color="success">
+        <ion-icon slot="start" [icon]="addCircleOutline"></ion-icon>
+        Añadir nuevo producto
+      </ion-button>
+    </div>
+  </ion-card-content>
+</ion-card>

@@ -1,0 +1,33 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Agenda de citas</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-list lines="none">
+      <ion-item *ngFor="let appointment of appointments; trackBy: trackById">
+        <ion-icon slot="start" [icon]="calendarOutline"></ion-icon>
+        <ion-label>
+          <h3>{{ appointment.title }}</h3>
+          <p>{{ appointment.date }} · {{ appointment.owner }}</p>
+        </ion-label>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" color="primary">
+            <ion-icon slot="icon-only" [icon]="createOutline"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" color="success">
+            <ion-icon slot="icon-only" [icon]="addOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+    </ion-list>
+    <div class="widget-actions" *ngIf="appointments.length === 0">
+      <p class="empty-message">
+        Aún no tienes citas programadas. Utiliza la agenda para crear tu primera cita.
+      </p>
+      <ion-button expand="block" color="primary">Gestionar agenda</ion-button>
+    </div>
+    <div class="widget-actions" *ngIf="appointments.length > 0">
+      <ion-button expand="block" color="primary">Ver agenda completa</ion-button>
+    </div>
+  </ion-card-content>
+</ion-card>

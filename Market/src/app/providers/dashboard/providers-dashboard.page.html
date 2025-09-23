@@ -1,0 +1,101 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-title>Panel del proveedor</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="medium" (click)="editPreferences()">
+        <ion-icon slot="start" [icon]="settingsOutline"></ion-icon>
+        Editar configuración
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ng-container *ngIf="preferences$ | async as preferences; else loading">
+    <div class="page-container">
+      <section class="module-section">
+        <ng-container *ngIf="preferences.modules.agenda; else agendaDisabled">
+          <app-calendar-widget [appointments]="sampleAppointments"></app-calendar-widget>
+        </ng-container>
+        <ng-template #agendaDisabled>
+          <ion-card class="disabled-card">
+            <ion-card-header>
+              <ion-card-title>Agenda de citas</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Activa este módulo para gestionar tus citas directamente desde el panel.</p>
+              <ion-button expand="block" fill="outline" (click)="editPreferences()">
+                Habilitar agenda
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ng-template>
+      </section>
+
+      <section class="module-section">
+        <ng-container *ngIf="preferences.modules.inventory; else inventoryDisabled">
+          <app-inventory-widget [inventory]="sampleInventory"></app-inventory-widget>
+        </ng-container>
+        <ng-template #inventoryDisabled>
+          <ion-card class="disabled-card">
+            <ion-card-header>
+              <ion-card-title>Gestión de productos</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>
+                Cuando actives este módulo podrás llevar el control de tu inventario y actualizarlo con un clic.
+              </p>
+              <ion-button expand="block" fill="outline" (click)="editPreferences()">
+                Habilitar gestión de productos
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ng-template>
+      </section>
+
+      <section class="module-section">
+        <ng-container *ngIf="preferences.modules.services; else servicesDisabled">
+          <app-services-widget [services]="preferences.servicesOffered"></app-services-widget>
+        </ng-container>
+        <ng-template #servicesDisabled>
+          <ion-card class="disabled-card">
+            <ion-card-header>
+              <ion-card-title>Servicios ofrecidos</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Activa este módulo para mostrar los servicios que prestas en tu perfil profesional.</p>
+              <ion-button expand="block" fill="outline" (click)="editPreferences()">
+                Habilitar servicios ofrecidos
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ng-template>
+      </section>
+
+      <section class="module-section">
+        <ng-container *ngIf="preferences.modules.species; else speciesDisabled">
+          <app-species-widget [species]="preferences.speciesAttended"></app-species-widget>
+        </ng-container>
+        <ng-template #speciesDisabled>
+          <ion-card class="disabled-card">
+            <ion-card-header>
+              <ion-card-title>Especies atendidas</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Configura este módulo para informar qué especies puedes atender en tu consultorio.</p>
+              <ion-button expand="block" fill="outline" (click)="editPreferences()">
+                Habilitar especies atendidas
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ng-template>
+      </section>
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  </ng-template>
+</ion-content>
