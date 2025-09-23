@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Perfil Proveedor</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="dashboard$ | async as dashboard">
+    <section *ngIf="dashboard.profile; else emptyState" class="profile-summary">
+      <div>
+        <h1>{{ dashboard.profile.name }}</h1>
+        <p class="profile-summary__meta">
+          <ion-icon name="location-outline"></ion-icon>
+          <span>{{ dashboard.profile.direccion }}</span>
+        </p>
+      </div>
+      <ion-chip color="primary" class="profile-summary__chip">
+        <ion-icon name="briefcase-outline"></ion-icon>
+        <ion-label>{{ dashboard.profile.services.length }} servicios activos</ion-label>
+      </ion-chip>
+    </section>
+
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <ion-icon name="clipboard-outline"></ion-icon>
+        <h2>Personaliza tu panel</h2>
+        <p>
+          Completa el registro de proveedor y selecciona los servicios que ofreces para generar métricas a tu medida.
+        </p>
+        <ion-button routerLink="/registro" fill="outline">Ir al registro</ion-button>
+      </div>
+    </ng-template>
+
+    <section class="widgets" *ngIf="dashboard.widgets.length > 0">
+      <ion-card *ngFor="let widget of dashboard.widgets; trackBy: trackWidget" class="widget-card">
+        <ion-card-header>
+          <div class="widget-card__title">
+            <ion-icon [name]="widget.icon"></ion-icon>
+            <div>
+              <ion-card-title>{{ widget.title }}</ion-card-title>
+              <ion-card-subtitle>{{ widget.description }}</ion-card-subtitle>
+            </div>
+          </div>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list lines="none">
+            <ion-item *ngFor="let metric of widget.metrics">
+              <ion-label>{{ metric.label }}</ion-label>
+              <ion-note slot="end">{{ metric.value }}</ion-note>
+            </ion-item>
+          </ion-list>
+          <ion-chip *ngIf="widget.highlight" color="secondary" class="widget-card__highlight">
+            <ion-icon name="time-outline"></ion-icon>
+            <ion-label>{{ widget.highlight }}</ion-label>
+          </ion-chip>
+          <ion-button *ngIf="widget.cta" size="small" fill="clear">{{ widget.cta }}</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </section>
+  </ng-container>
+</ion-content>
+
