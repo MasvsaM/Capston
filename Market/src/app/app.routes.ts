@@ -28,7 +28,7 @@ export const routes: Routes = [
   },
   {
     path: 'registro',
-    loadComponent: () => import('./registro/registro.page').then(m => m.RegistroPage),
+    loadComponent: () => import('./pages/auth/sign-up/sign-up.page').then(m => m.SignUpPage),
   },
   {
     path: 'perfil-cliente',
