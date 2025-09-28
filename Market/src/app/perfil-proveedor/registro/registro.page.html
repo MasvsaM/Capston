@@ -7,9 +7,6 @@
 <ion-content class="ion-padding">
 
   <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" class="registro-form">
-
-  <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
- main
     <ion-item>
       <ion-label>Rol</ion-label>
       <ion-segment formControlName="role">
@@ -21,18 +18,12 @@
     <!-- Campo dinámico según rol -->
 
     <ion-item *ngIf="isProveedor()">
-
-    <ion-item *ngIf="registroForm.get('role')?.value === 'proveedor'">
-main
       <ion-label position="floating">Nombre o Razón Social</ion-label>
       <ion-input formControlName="nombre"></ion-input>
     </ion-item>
 
 
     <ion-item *ngIf="!isProveedor()">
-
-    <ion-item *ngIf="registroForm.get('role')?.value === 'cliente'">
-main
       <ion-label position="floating">Nombre</ion-label>
       <ion-input formControlName="nombre"></ion-input>
     </ion-item>
@@ -41,8 +32,6 @@ main
 
     <ion-item *ngIf="isProveedor()">
 
-    <ion-item *ngIf="registroForm.get('role')?.value === 'proveedor'">
-main
       <ion-label position="floating">RUT</ion-label>
       <ion-input formControlName="rut"></ion-input>
     </ion-item>
@@ -149,9 +138,6 @@ main
     <ion-text color="danger" *ngIf="errorMessage()">
       <p class="error-text">{{ errorMessage() }}</p>
     </ion-text>
-
-    <ion-button expand="block" type="submit" class="ion-margin-top">Registrarse</ion-button>
- main
   </form>
 
   <div class="ion-text-center ion-margin-top">
