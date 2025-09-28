@@ -6,7 +6,6 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideStorage, getStorage } from '@angular/fire/storage';
- main
 
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -52,7 +51,6 @@ const initFirebase = async (): Promise<void> => {
 
 void initFirebase().catch(error => console.error('Error initializing Firebase', error));
 
- main
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
@@ -63,6 +61,5 @@ bootstrapApplication(AppComponent, {
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     provideStorage(() => getStorage()),
-main
   ],
 }).catch(error => console.error(error));

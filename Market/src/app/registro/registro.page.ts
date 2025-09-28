@@ -45,12 +45,6 @@ function atLeastOneService(control: AbstractControl): ValidationErrors | null {
   return formArray.length > 0 ? null : { required: true };
 }
 
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
- main
-
 @Component({
   selector: 'app-registro',
   standalone: true,
@@ -278,26 +272,5 @@ export class RegistroPage {
     } finally {
       this.saving.set(false);
     }
-
-
-  readonly registroForm = this.fb.group({
-    role: ['cliente', Validators.required],
-    nombre: ['', Validators.required],
-    rut: [''],
-    direccion: ['', Validators.required],
-    telefono: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
-  });
-
-  onSubmit(): void {
-    if (this.registroForm.invalid) {
-      this.registroForm.markAllAsTouched();
-      return;
-    }
-
-    const datos = this.registroForm.value;
-    console.log('Registro con:', datos);
- main
   }
 }
