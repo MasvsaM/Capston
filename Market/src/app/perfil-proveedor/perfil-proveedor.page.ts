@@ -7,20 +7,11 @@ import { IonicModule } from '@ionic/angular';
 import { DashboardWidget, ProviderDashboardService } from '../shared/services/provider-dashboard.service';
 import { map } from 'rxjs';
 
-import { Component } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-main
 
 @Component({
   selector: 'app-perfil-proveedor',
   standalone: true,
-
   imports: [IonicModule, CommonModule, FormsModule, RouterModule],
-
-  imports: [IonicModule, CommonModule, FormsModule],
-main
   templateUrl: './perfil-proveedor.page.html',
   styleUrls: ['./perfil-proveedor.page.scss'],
 })
@@ -37,7 +28,7 @@ export class PerfilProveedorPage {
 
   trackWidget(_: number, widget: DashboardWidget): string {
     return widget.id;
-
+  };
   servicios = [
     { nombre: 'Peluquería a domicilio', modalidad: 'Domicilio', precio: 20000 },
   ];
@@ -52,7 +43,6 @@ export class PerfilProveedorPage {
 
   agregarProducto() {
     this.productos.push({ nombre: '', precio: 0 });
-main
+
   }
 }
-
