@@ -1,22 +1,219 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>MarketPet</ion-title>
+<ion-header translucent="true" class="home-header">
+  <ion-toolbar>
+    <div class="header-content">
+      <div class="branding">
+        <div class="logo">
+          <ion-icon name="heart" />
+        </div>
+        <div>
+          <h1>MarketPet</h1>
+          <p>Marketplace de bienestar animal</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <ion-badge color="tertiary" class="plan-badge">
+          Plan {{ user.planType }}
+        </ion-badge>
+        <ion-button fill="clear" size="small" class="icon-button" aria-label="Notificaciones">
+          <ion-icon slot="icon-only" name="notifications-outline" />
+        </ion-button>
+        <ion-button fill="clear" size="small" class="icon-button" aria-label="Perfil" [routerLink]="['/perfil-cliente']">
+          <ion-icon slot="icon-only" name="person-circle-outline" />
+        </ion-button>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding ion-text-center">
-  <h1>Bienvenido a MarketPet</h1>
-  <p>Tu marketplace para productos y servicios de mascotas.</p>
+<ion-content [fullscreen]="true" class="home-content">
+  <div class="page-padding">
+    <ion-card class="welcome-card">
+      <ion-card-header>
+        <ion-card-subtitle>Hola, {{ user.name }}</ion-card-subtitle>
+        <ion-card-title>Organiza el cuidado de tus mascotas desde un solo lugar</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="welcome-meta">
+          <div class="meta-item">
+            <ion-icon name="location-outline" />
+            <span>{{ user.location }}</span>
+          </div>
+          <div class="meta-item">
+            <ion-icon name="call-outline" />
+            <span>{{ user.phone }}</span>
+          </div>
+        </div>
+        <ion-button expand="block" class="primary-action" [routerLink]="['/feed']">
+          <ion-icon slot="start" name="search-outline" />
+          Buscar proveedores
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
 
-  <ion-button expand="block" color="secondary" [routerLink]="['/auth']">
-    Iniciar Sesión
-  </ion-button>
+    <section class="section">
+      <div class="section-header">
+        <h2>Acciones rápidas</h2>
+        <ion-button fill="clear" size="small">Ver todas</ion-button>
+      </div>
+      <div class="quick-actions">
+        <ion-card
+          class="quick-action"
+          *ngFor="let action of quickActions; trackBy: trackByIndex"
+          [ngClass]="'quick-action--' + action.color"
+          [routerLink]="action.routerLink"
+        >
+          <ion-card-content>
+            <div class="quick-action__icon">
+              <ion-icon [name]="action.icon" />
+            </div>
+            <div>
+              <h3>{{ action.label }}</h3>
+              <p>{{ action.description }}</p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </section>
 
-  <ion-button expand="block" color="tertiary" [routerLink]="['/registro']">
-    Registrarse
-  </ion-button>
+    <section class="section">
+      <div class="section-header">
+        <h2>Tus mascotas</h2>
+        <ion-button fill="clear" size="small">Añadir mascota</ion-button>
+      </div>
+      <div class="horizontal-scroll">
+        <ion-card class="pet-card" *ngFor="let pet of pets; trackBy: trackByIndex">
+          <ion-card-header>
+            <ion-card-subtitle>{{ pet.species }}</ion-card-subtitle>
+            <ion-card-title>{{ pet.name }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="pet-card__details">
+              <div>
+                <span class="label">Raza</span>
+                <strong>{{ pet.breed }}</strong>
+              </div>
+              <div>
+                <span class="label">Edad</span>
+                <strong>{{ pet.age }}</strong>
+              </div>
+              <div>
+                <span class="label">Peso</span>
+                <strong>{{ pet.weight }}</strong>
+              </div>
+            </div>
+            <div class="pet-card__vaccines">
+              <span class="label">Vacunas</span>
+              <ion-chip color="light" *ngFor="let vaccine of pet.vaccinations; trackBy: trackByIndex">
+                <ion-icon name="shield-checkmark-outline" />
+                <ion-label>{{ vaccine }}</ion-label>
+              </ion-chip>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </section>
 
-  <ion-button expand="block" color="success" [routerLink]="['/feed']">
-    Ver Marketplace
-  </ion-button>
+    <section class="section">
+      <div class="section-header">
+        <h2>Próximas citas</h2>
+        <ion-button fill="clear" size="small">Ver historial</ion-button>
+      </div>
+      <ion-list class="appointment-list">
+        <ion-item *ngFor="let appointment of appointments; trackBy: trackByIndex">
+          <ion-icon name="calendar-clear-outline" slot="start" class="appointment-icon" />
+          <ion-label>
+            <h3>{{ appointment.service }}</h3>
+            <p>
+              {{ appointment.petName }} · {{ appointment.providerName }}
+            </p>
+            <p class="secondary">
+              {{ appointment.date }} · {{ appointment.time }} hrs
+            </p>
+          </ion-label>
+          <ion-badge slot="end" [color]="statusBadgeColor[appointment.status]">
+            {{ appointment.status === 'confirmed' ? 'Confirmada' : appointment.status === 'pending' ? 'Pendiente' : 'Completada' }}
+          </ion-badge>
+        </ion-item>
+      </ion-list>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Proveedores destacados</h2>
+        <ion-button fill="clear" size="small">Ver todos</ion-button>
+      </div>
+      <div class="vertical-stack">
+        <ion-card class="provider-card" *ngFor="let provider of providers; trackBy: trackByIndex">
+          <img [src]="provider.imageUrl" [alt]="provider.name" loading="lazy" />
+          <ion-card-content>
+            <div class="provider-card__header">
+              <div>
+                <h3>{{ provider.name }}</h3>
+                <p>{{ provider.profession }} · {{ provider.location }}</p>
+              </div>
+              <div class="provider-card__rating">
+                <ion-icon name="star" />
+                <span>{{ provider.rating }}</span>
+                <small>({{ provider.reviewCount }})</small>
+              </div>
+            </div>
+            <div class="provider-card__specialties">
+              <ion-chip color="secondary" *ngFor="let specialty of provider.specialties; trackBy: trackByIndex">
+                <ion-label>{{ specialty }}</ion-label>
+              </ion-chip>
+            </div>
+            <div class="provider-card__meta">
+              <div>
+                <ion-icon name="time-outline" />
+                <span>{{ provider.availability }}</span>
+              </div>
+              <div>
+                <ion-icon name="pricetag-outline" />
+                <span>{{ provider.price }}</span>
+              </div>
+            </div>
+            <ion-button expand="block" fill="outline" color="primary" [routerLink]="['/feed']">
+              Contactar
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Planes de suscripción</h2>
+        <ion-button fill="clear" size="small">Comparar planes</ion-button>
+      </div>
+      <div class="plan-grid">
+        <ion-card
+          class="plan-card"
+          *ngFor="let plan of subscriptionPlans; trackBy: trackByIndex"
+          [ngClass]="{ 'plan-card--current': plan.isCurrentPlan, 'plan-card--popular': plan.isPopular }"
+        >
+          <ion-card-header>
+            <ion-card-subtitle *ngIf="plan.isCurrentPlan">Plan actual</ion-card-subtitle>
+            <ion-card-subtitle *ngIf="plan.isPopular && !plan.isCurrentPlan">Más popular</ion-card-subtitle>
+            <ion-card-title>{{ plan.name }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="plan-card__price">
+              <span>{{ plan.price }}</span>
+              <small>/{{ plan.period }}</small>
+            </div>
+            <ul>
+              <li *ngFor="let feature of plan.features; trackBy: trackByIndex">
+                <ion-icon name="checkmark-circle-outline" />
+                <span>{{ feature }}</span>
+              </li>
+            </ul>
+            <ion-button expand="block" [fill]="plan.isCurrentPlan ? 'solid' : 'outline'" color="primary">
+              {{ plan.isCurrentPlan ? 'Gestionar plan' : 'Mejorar plan' }}
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </section>
+  </div>
 </ion-content>
