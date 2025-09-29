@@ -11,12 +11,12 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ProviderDashboardService, ProviderProfile } from '../shared/services/provider-dashboard.service';
-import { FirebaseCrudService } from '../shared/services/firebase-crud.service';
-import { emailToDocumentId } from '../shared/utils/firestore-id.util';
+import { ProviderDashboardService, ProviderProfile } from '../../shared/services/provider-dashboard.service';
+import { FirebaseCrudService } from '../../shared/services/firebase-crud.service';
+import { emailToDocumentId } from '../../shared/utils/firestore-id.util';
 
 type UserRole = 'cliente' | 'proveedor';
 
@@ -44,12 +44,6 @@ function atLeastOneService(control: AbstractControl): ValidationErrors | null {
   return formArray.length > 0 ? null : { required: true };
 }
 
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
- main
-
 @Component({
   selector: 'app-registro',
   standalone: true,
@@ -61,9 +55,10 @@ export class RegistroPage {
   private readonly fb = inject(FormBuilder);
 
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly dashboardService = inject(ProviderDashboardService);
-  private readonly firebaseCrud = inject(FirebaseCrudService);
+  private readonly dashboardService: ProviderDashboardService = inject(ProviderDashboardService);
+  private readonly firebaseCrud: FirebaseCrudService = inject(FirebaseCrudService);
 
   readonly serviceOptions: ServiceOption[] = [
     {
@@ -134,6 +129,12 @@ export class RegistroPage {
   readonly isProveedor = computed(() => this.registroForm.get('role')?.value === 'proveedor');
 
   constructor() {
+    const roleFromQuery = this.route.snapshot.queryParamMap.get('role');
+
+    if (roleFromQuery === 'cliente' || roleFromQuery === 'proveedor') {
+      this.registroForm.patchValue({ role: roleFromQuery });
+    }
+
     this.registroForm
       .get('role')
       ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
@@ -271,32 +272,11 @@ export class RegistroPage {
       });
 
       void this.router.navigate(['/perfil-cliente']);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error durante el registro', error);
       this.errorMessage.set('No pudimos guardar tus datos. Inténtalo nuevamente en unos minutos.');
     } finally {
       this.saving.set(false);
     }
-
-
-  readonly registroForm = this.fb.group({
-    role: ['cliente', Validators.required],
-    nombre: ['', Validators.required],
-    rut: [''],
-    direccion: ['', Validators.required],
-    telefono: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
-  });
-
-  onSubmit(): void {
-    if (this.registroForm.invalid) {
-      this.registroForm.markAllAsTouched();
-      return;
-    }
-
-    const datos = this.registroForm.value;
-    console.log('Registro con:', datos);
- main
   }
 }

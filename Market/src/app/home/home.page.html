@@ -1,22 +1,209 @@
-<ion-header>
-  <ion-toolbar color="primary">
+<ion-header translucent="true" class="home-header">
+  <ion-toolbar>
     <ion-title>MarketPet</ion-title>
+    <ion-buttons slot="end" class="home-header__actions">
+      <ion-button fill="clear" color="medium" [routerLink]="['/feed']">Marketplace</ion-button>
+      <ion-button fill="clear" color="medium" [routerLink]="['/auth']">Iniciar sesión</ion-button>
+      <ion-button shape="round" color="primary" [routerLink]="['/registro']">Crear cuenta</ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding ion-text-center">
-  <h1>Bienvenido a MarketPet</h1>
-  <p>Tu marketplace para productos y servicios de mascotas.</p>
+<ion-content [fullscreen]="true" class="home-content">
+  <section class="hero">
+    <div class="hero__content">
+      <ion-chip color="light" class="hero__tagline">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        <ion-label>Crea experiencias felices para tus mascotas</ion-label>
+      </ion-chip>
+      <h1>Encuentra todo lo que tu compañero necesita en un solo lugar.</h1>
+      <p>
+        Productos especializados, servicios confiables y profesionales verificados para cada etapa de
+        vida. Diseñado para quienes quieren darles lo mejor.
+      </p>
+      <div class="hero__actions">
+        <ion-button shape="round" size="large" color="primary" (click)="navigateToMarketplace()">
+          Explorar marketplace
+        </ion-button>
+        <ion-button
+          shape="round"
+          size="large"
+          fill="outline"
+          color="light"
+          (click)="navigateToProviderRegistration()"
+        >
+          Soy proveedor
+        </ion-button>
+      </div>
+      <div class="hero__stats">
+        <div class="hero__stat" *ngFor="let stat of stats">
+          <span class="hero__stat-value">{{ stat.value }}</span>
+          <span class="hero__stat-label">{{ stat.label }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero__illustration">
+      <div class="hero__gradient"></div>
+      <img src="assets/shapes.svg" alt="Mascotas felices" />
+    </div>
+  </section>
 
-  <ion-button expand="block" color="secondary" [routerLink]="['/auth']">
-    Iniciar Sesión
-  </ion-button>
+  <section class="search">
+    <ion-card class="search__card">
+      <ion-card-header>
+        <ion-card-subtitle>Busca por categoría, especie o servicio</ion-card-subtitle>
+        <ion-card-title>¿Qué necesita tu mascota hoy?</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="search__bar">
+          <ion-icon name="search-outline"></ion-icon>
+          <ion-input
+            type="search"
+            placeholder="Alimento hipoalergénico, paseo, veterinario..."
+            [(ngModel)]="searchQuery"
+          ></ion-input>
+          <ion-button shape="round" color="dark" (click)="navigateToMarketplace()">Buscar</ion-button>
+        </div>
+        <div class="search__quick-actions">
+          <ion-chip
+            *ngFor="let action of quickActions"
+            [color]="action.color"
+            (click)="navigateToMarketplace()"
+          >
+            <ion-icon [name]="action.icon"></ion-icon>
+            <ion-label>{{ action.label }}</ion-label>
+          </ion-chip>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </section>
 
-  <ion-button expand="block" color="tertiary" [routerLink]="['/registro']">
-    Registrarse
-  </ion-button>
+  <section class="categories">
+    <div class="section-header">
+      <h2>Categorías destacadas</h2>
+      <ion-button fill="clear" size="small" color="primary" (click)="navigateToMarketplace()">
+        Ver todo
+      </ion-button>
+    </div>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="3" *ngFor="let category of categories">
+          <ion-card class="category-card" [ngClass]="category.color">
+            <div class="category-card__icon">
+              <ion-icon [name]="category.icon"></ion-icon>
+            </div>
+            <ion-card-title>{{ category.name }}</ion-card-title>
+            <p>{{ category.description }}</p>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </section>
 
-  <ion-button expand="block" color="success" [routerLink]="['/feed']">
-    Ver Marketplace
-  </ion-button>
+  <section class="trending">
+    <div class="section-header">
+      <div>
+        <h2>Recomendados para tus mascotas</h2>
+        <p>Seleccionados según tendencias y valoraciones de nuestra comunidad.</p>
+      </div>
+      <ion-button fill="outline" color="primary" shape="round" (click)="navigateToMarketplace()">
+        Ver marketplace
+      </ion-button>
+    </div>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let item of trendingItems">
+          <ion-card class="product-card">
+            <img [src]="item.image" [alt]="item.name" loading="lazy" />
+            <ion-card-header>
+              <ion-chip color="light" class="product-card__chip">
+                <ion-icon name="pricetag-outline"></ion-icon>
+                <ion-label>{{ item.type }}</ion-label>
+              </ion-chip>
+              <ion-card-title>{{ item.name }}</ion-card-title>
+              <ion-card-subtitle>{{ item.price }}</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <p>{{ item.description }}</p>
+              <ion-button expand="block" shape="round" color="primary" (click)="navigateToMarketplace()">
+                Ver detalle
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </section>
+
+  <section class="providers">
+    <div class="section-header">
+      <div>
+        <h2>Profesionales destacados</h2>
+        <p>Aliados certificados y calificados por la comunidad MarketPet.</p>
+      </div>
+      <ion-button fill="clear" color="primary" size="small" (click)="navigateToMarketplace()">
+        Ver proveedores
+      </ion-button>
+    </div>
+    <div class="providers__list">
+      <ion-card class="providers__card" *ngFor="let provider of providers">
+        <div class="providers__avatar">
+          <img [src]="provider.avatar" [alt]="provider.name" loading="lazy" />
+        </div>
+        <ion-card-header>
+          <ion-card-title>{{ provider.name }}</ion-card-title>
+          <ion-card-subtitle>{{ provider.speciality }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-chip color="success" class="providers__rating">
+            <ion-icon name="star"></ion-icon>
+            <ion-label>{{ provider.rating }}</ion-label>
+          </ion-chip>
+          <ion-button expand="block" fill="outline" shape="round" (click)="navigateToMarketplace()">
+            Contactar
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </section>
+
+  <section class="testimonials">
+    <div class="section-header">
+      <div>
+        <h2>Historias de la comunidad</h2>
+        <p>Familias que ya confían en MarketPet.</p>
+      </div>
+    </div>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="4" *ngFor="let testimonial of testimonials">
+          <ion-card class="testimonial-card">
+            <ion-icon name="chatbubbles-outline"></ion-icon>
+            <p>“{{ testimonial.comment }}”</p>
+            <div class="testimonial-card__author">
+              <h3>{{ testimonial.name }}</h3>
+              <span>{{ testimonial.petType }}</span>
+            </div>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </section>
+
+  <section class="cta">
+    <ion-card class="cta__card">
+      <div>
+        <h2>Listo para transformar la vida de tus mascotas?</h2>
+        <p>Únete hoy y accede a beneficios exclusivos, recomendaciones inteligentes y proveedores verificados.</p>
+      </div>
+      <div class="cta__actions">
+        <ion-button shape="round" size="large" color="light" [routerLink]="['/registro']">
+          Crear cuenta gratuita
+        </ion-button>
+        <ion-button shape="round" size="large" color="primary" (click)="navigateToMarketplace()">
+          Ver marketplace
+        </ion-button>
+      </div>
+    </ion-card>
+  </section>
 </ion-content>
