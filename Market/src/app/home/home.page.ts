@@ -4,6 +4,24 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+interface HeroHighlight {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface BenefitCard {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface WorkflowStep {
+  number: string;
+  title: string;
+  description: string;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -14,10 +32,66 @@ import { FormsModule } from '@angular/forms';
 export class HomePage {
   searchQuery = '';
 
+  heroHighlights: HeroHighlight[] = [
+    {
+      icon: 'shield-checkmark-outline',
+      title: 'Profesionales verificados',
+      description: 'Calificaciones transparentes y perfiles auditados para tu tranquilidad.',
+    },
+    {
+      icon: 'time-outline',
+      title: 'Reservas flexibles',
+      description: 'Agenda en minutos y administra tus citas desde cualquier dispositivo.',
+    },
+    {
+      icon: 'gift-outline',
+      title: 'Beneficios exclusivos',
+      description: 'Accede a promociones y recomendaciones personalizadas para cada mascota.',
+    },
+  ];
+
   stats = [
     { value: '1200+', label: 'Productos especializados' },
     { value: '450+', label: 'Servicios profesionales' },
     { value: '320+', label: 'Proveedores verificados' },
+  ];
+
+  trustedBrands: string[] = ['PetLife', 'Vet&Care', 'HappyTails', 'PawHub', 'Guardianes 24/7'];
+
+  benefits: BenefitCard[] = [
+    {
+      icon: 'flash-outline',
+      title: 'Búsqueda inteligente',
+      description: 'Filtra por especie, necesidades y ubicación para encontrar la solución ideal.',
+    },
+    {
+      icon: 'bar-chart-outline',
+      title: 'Gestión centralizada',
+      description: 'Controla pagos, citas y seguimiento desde un panel diseñado para proveedores.',
+    },
+    {
+      icon: 'earth-outline',
+      title: 'Cobertura nacional',
+      description: 'Conecta con especialistas locales y servicios remotos en todo el país.',
+    },
+  ];
+
+  workflowSteps: WorkflowStep[] = [
+    {
+      number: '01',
+      title: 'Explora y compara',
+      description: 'Descubre proveedores, productos y experiencias pensadas para cada tipo de mascota.',
+    },
+    {
+      number: '02',
+      title: 'Reserva en minutos',
+      description: 'Agenda o compra de forma segura con disponibilidad en tiempo real y pagos protegidos.',
+    },
+    {
+      number: '03',
+      title: 'Recibe seguimiento',
+      description: 'Evalúa tu experiencia, guarda favoritos y recibe recomendaciones personalizadas.',
+    },
   ];
 
   quickActions = [
@@ -140,4 +214,3 @@ export class HomePage {
     });
   }
 }
-
