@@ -1,24 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
-import { ProviderDashboardService } from '../shared/services/provider-dashboard.service';
 import { PerfilProveedorPage } from './perfil-proveedor.page';
+import { ProviderDashboardService, DashboardWidget } from '../shared/services/provider-dashboard.service';
 
 class ProviderDashboardServiceStub {
   readonly profile$ = of(null);
 
-  getWidgets = jasmine.createSpy().and.returnValue([]);
+  getWidgets(): DashboardWidget[] {
+    return [];
+  }
 }
 
-=======
-import { PerfilProveedorPage } from './perfil-proveedor.page';
-
-main
 describe('PerfilProveedorPage', () => {
   let component: PerfilProveedorPage;
   let fixture: ComponentFixture<PerfilProveedorPage>;
-
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -26,9 +22,6 @@ describe('PerfilProveedorPage', () => {
       providers: [{ provide: ProviderDashboardService, useClass: ProviderDashboardServiceStub }],
     }).compileComponents();
 
-=======
-  beforeEach(() => {
-main
     fixture = TestBed.createComponent(PerfilProveedorPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
