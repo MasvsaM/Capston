@@ -19,7 +19,15 @@
     "target": "es2022",
     "module": "es2020",
     "lib": ["es2022", "dom"],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "paths": {
+      "@nucleo/*": ["src/app/nucleo/*"],
+      "@nucleo/servicios/*": ["src/app/nucleo/services/*"],
+      "@nucleo/guardias/*": ["src/app/nucleo/guards/*"],
+      "@compartido/*": ["src/app/compartido/*"],
+      "@compartido/modelos/*": ["src/app/compartido/modelos/*"],
+      "@funcionalidades/*": ["src/app/funcionalidades/*"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
