@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Panel de proveedor</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="panel-content" fullscreen>
+  <section class="stats" *ngIf="(resumen$ | async) as resumen">
+    <ion-card class="stat-card">
+      <ion-card-header>
+        <ion-card-title>Ingresos del mes</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <h2>{{ resumen.ingresosMensuales | currency:'MXN' }}</h2>
+      </ion-card-content>
+    </ion-card>
+    <ion-card class="stat-card">
+      <ion-card-header>
+        <ion-card-title>Citas pendientes</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <h2>{{ resumen.citasPendientes }}</h2>
+      </ion-card-content>
+    </ion-card>
+    <ion-card class="stat-card">
+      <ion-card-header>
+        <ion-card-title>Calificación promedio</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <h2>{{ resumen.calificacionPromedio }} ★</h2>
+      </ion-card-content>
+    </ion-card>
+    <ion-card class="stat-card">
+      <ion-card-header>
+        <ion-card-title>Servicios activos</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <h2>{{ resumen.serviciosActivos }}</h2>
+      </ion-card-content>
+    </ion-card>
+  </section>
+
+  <section class="dashboard-section">
+    <h3>Próximos pedidos</h3>
+    <ion-list>
+      <ion-item *ngFor="let pedido of (pedidos$ | async) | slice:0:3">
+        <ion-label>
+          <h2>{{ pedido.cliente }} • {{ pedido.mascota }}</h2>
+          <p>{{ pedido.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+        </ion-label>
+        <ion-note slot="end">{{ pedido.estado | titlecase }}</ion-note>
+      </ion-item>
+    </ion-list>
+  </section>
+
+  <section class="dashboard-section">
+    <h3>Servicios destacados</h3>
+    <ion-list>
+      <ion-item *ngFor="let servicio of (servicios$ | async) | slice:0:3">
+        <ion-label>
+          <h2>{{ servicio.nombre }}</h2>
+          <p>{{ servicio.descripcion }}</p>
+        </ion-label>
+        <ion-badge [color]="servicio.activo ? 'success' : 'medium'">
+          {{ servicio.activo ? 'Activo' : 'Inactivo' }}
+        </ion-badge>
+      </ion-item>
+    </ion-list>
+  </section>
+</ion-content>

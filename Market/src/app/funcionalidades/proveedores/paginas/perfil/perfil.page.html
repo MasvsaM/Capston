@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Perfil del proveedor</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="perfil-content" fullscreen>
+  <ng-container *ngIf="(perfil$ | async) as perfil">
+    <section class="perfil-header">
+      <ion-avatar>
+        <img [src]="perfil.fotoUrl" [alt]="perfil.nombre">
+      </ion-avatar>
+      <div>
+        <h2>{{ perfil.nombre }}</h2>
+        <p>{{ perfil.ubicacion }}</p>
+        <ion-chip color="primary" *ngFor="let especialidad of perfil.especialidades">
+          {{ especialidad }}
+        </ion-chip>
+      </div>
+    </section>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Biografía</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>{{ perfil.biografia }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Experiencia</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>{{ perfil.experiencia }} años de experiencia</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Contacto</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="contacto">
+        <ion-item lines="none">
+          <ion-icon name="call-outline" slot="start"></ion-icon>
+          <ion-label>{{ perfil.contacto.telefono }}</ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-icon name="mail-outline" slot="start"></ion-icon>
+          <ion-label>{{ perfil.contacto.correo }}</ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+</ion-content>

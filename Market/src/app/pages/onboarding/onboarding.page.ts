@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonContent, IonButton, IonIcon, IonCard, IonCardContent,
@@ -340,7 +340,7 @@ import { FormsModule } from '@angular/forms';
     IonCheckbox, FormsModule
   ]
 })
-export class OnboardingPage implements OnInit {
+export class OnboardingPage {
   private router = inject(Router);
 
   currentStep = 0;
@@ -356,10 +356,6 @@ export class OnboardingPage implements OnInit {
       pawOutline, heartOutline, starOutline, shieldCheckmarkOutline,
       notificationsOutline, locationOutline, chevronForwardOutline
     });
-  }
-
-  ngOnInit() {
-    // Request permissions if granted in step 2
   }
 
   nextStep() {

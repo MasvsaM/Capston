@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Disponibilidad</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="disponibilidad-content" fullscreen>
+  <ion-list>
+    <ion-item-group *ngFor="let dia of (disponibilidad$ | async)">
+      <ion-item-divider>
+        <ion-label>{{ dia.dia }}</ion-label>
+        <ion-button fill="clear" color="medium" size="small" slot="end" (click)="limpiarHorarios(dia.dia)">
+          Limpiar
+        </ion-button>
+      </ion-item-divider>
+      <ion-item lines="none" *ngIf="dia.horarios.length === 0">
+        <ion-label color="medium">Sin horarios configurados</ion-label>
+      </ion-item>
+      <ion-item *ngFor="let horario of dia.horarios">
+        <ion-label>{{ horario }}</ion-label>
+        <ion-badge color="success" slot="end">Disponible</ion-badge>
+      </ion-item>
+    </ion-item-group>
+  </ion-list>
+</ion-content>
