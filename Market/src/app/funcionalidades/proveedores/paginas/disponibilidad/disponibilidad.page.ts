@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import {
@@ -10,6 +12,8 @@ import {
   selector: 'app-proveedores-disponibilidad',
   templateUrl: './disponibilidad.page.html',
   styleUrls: ['./disponibilidad.page.scss'],
+  standalone: true,
+  imports: [CommonModule, IonicModule],
 })
 export class DisponibilidadPage implements OnInit {
   private readonly fachada = inject(FachadaProveedores);

@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import {
   FachadaProveedores,
@@ -9,6 +11,8 @@ import {
   selector: 'app-proveedores-servicios',
   templateUrl: './servicios.page.html',
   styleUrls: ['./servicios.page.scss'],
+  standalone: true,
+  imports: [CommonModule, IonicModule],
 })
 export class ServiciosPage implements OnInit {
   private readonly fachada = inject(FachadaProveedores);

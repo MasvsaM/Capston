@@ -10,17 +10,15 @@ import { ServiciosPage } from './paginas/servicios/servicios.page';
 import { PedidosPage } from './paginas/pedidos/pedidos.page';
 
 @NgModule({
-  declarations: [
+  imports: [
+    CommonModule,
+    IonicModule,
+    ProveedoresRoutingModule,
     PanelPage,
     PerfilPage,
     DisponibilidadPage,
     ServiciosPage,
     PedidosPage,
-  ],
-  imports: [
-    CommonModule,
-    IonicModule,
-    ProveedoresRoutingModule,
   ],
 })
 export class ProveedoresModule {}
