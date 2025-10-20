@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonContent, IonButton, IonIcon, IonCard, IonCardContent,
@@ -58,9 +58,10 @@ import { FormsModule } from '@angular/forms';
             <ion-card class="permission-card">
               <ion-card-content>
                 <div class="permission-item">
-                  <ion-checkbox 
-                    [(ngModel)]="permissions.notifications" 
-                    color="primary">
+                  <ion-checkbox
+                    [(ngModel)]="permissions.notifications"
+                    color="primary"
+                    (ionChange)="handlePermissionToggle()">
                   </ion-checkbox>
                   <div class="permission-info">
                     <ion-icon name="notifications-outline" color="primary"></ion-icon>
@@ -72,9 +73,10 @@ import { FormsModule } from '@angular/forms';
                 </div>
                 
                 <div class="permission-item">
-                  <ion-checkbox 
-                    [(ngModel)]="permissions.location" 
-                    color="primary">
+                  <ion-checkbox
+                    [(ngModel)]="permissions.location"
+                    color="primary"
+                    (ionChange)="handlePermissionToggle()">
                   </ion-checkbox>
                   <div class="permission-info">
                     <ion-icon name="location-outline" color="primary"></ion-icon>
@@ -340,7 +342,7 @@ import { FormsModule } from '@angular/forms';
     IonCheckbox, FormsModule
   ]
 })
-export class OnboardingPage {
+export class OnboardingPage implements OnInit {
   private router = inject(Router);
 
   currentStep = 0;
@@ -352,10 +354,14 @@ export class OnboardingPage {
   };
 
   constructor() {
-    addIcons({ 
+    addIcons({
       pawOutline, heartOutline, starOutline, shieldCheckmarkOutline,
       notificationsOutline, locationOutline, chevronForwardOutline
     });
+  }
+
+  ngOnInit(): void {
+    this.restoreSavedPermissions();
   }
 
   nextStep() {
@@ -367,7 +373,9 @@ export class OnboardingPage {
   completeOnboarding() {
     // Save onboarding completion status
     localStorage.setItem('onboarding_completed', 'true');
-    
+
+    this.persistPermissions();
+
     // Request permissions if user accepted them
     if (this.permissions.notifications) {
       this.requestNotificationPermission();
@@ -376,9 +384,13 @@ export class OnboardingPage {
     if (this.permissions.location) {
       this.requestLocationPermission();
     }
-    
+
     // Navigate to main app
     this.router.navigate(['/tabs/pets'], { replaceUrl: true });
+  }
+
+  handlePermissionToggle(): void {
+    this.persistPermissions();
   }
 
   private async requestNotificationPermission() {
@@ -398,5 +410,26 @@ export class OnboardingPage {
         }
       );
     }
+  }
+
+  private restoreSavedPermissions(): void {
+    const stored = localStorage.getItem('onboarding_permissions');
+    if (!stored) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(stored) as Partial<typeof this.permissions>;
+      this.permissions = {
+        notifications: parsed.notifications ?? this.permissions.notifications,
+        location: parsed.location ?? this.permissions.location,
+      };
+    } catch {
+      localStorage.removeItem('onboarding_permissions');
+    }
+  }
+
+  private persistPermissions(): void {
+    localStorage.setItem('onboarding_permissions', JSON.stringify(this.permissions));
   }
 }
