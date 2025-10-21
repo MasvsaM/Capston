@@ -23,7 +23,9 @@
     "paths": {
       "@nucleo/*": ["app/nucleo/*"],
       "@compartido/*": ["app/compartido/*"],
-      "@funcionalidades/*": ["app/funcionalidades/*"]
+      "@funcionalidades/*": ["app/funcionalidades/*"],
+      "@testing/*": ["testing/*"],
+      "@testing": ["testing/index.ts"]
     }
   },
   "angularCompilerOptions": {

@@ -12,3 +12,4 @@ Los dos primeros comandos permiten asegurar que las pruebas unitarias (incluidos
 
 `ionic serve --no-open` inicia el servidor de desarrollo de Ionic sin abrir el navegador automáticamente. Es útil para verificar que la aplicación arranca adecuadamente; finaliza el proceso con `Ctrl+C` cuando ya no se necesite.
 
+
