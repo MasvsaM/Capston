@@ -16,7 +16,7 @@ import {
   IonSegmentButton,
   IonToast
 } from '@ionic/angular/standalone';
-import { AuthService } from '@nucleo/servicios/auth.service';
+import { ServicioAutenticacion } from '@nucleo/firebase';
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoFacebook, eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, personOutline, callOutline } from 'ionicons/icons';
 
@@ -322,7 +322,7 @@ import { logoGoogle, logoFacebook, eyeOutline, eyeOffOutline, mailOutline, lockC
 })
 export class AuthPage {
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+  private servicioAutenticacion = inject(ServicioAutenticacion);
   private router = inject(Router);
 
   isRegister = false;
@@ -388,19 +388,19 @@ export class AuthPage {
           });
         } else {
           // Register as client
-          const result = await this.authService.register(formData.email, formData.password, {
+          await this.servicioAutenticacion.registrar(formData.email, formData.password, {
             name: formData.name,
             phone: formData.phone,
             userType: 'client'
           });
-          
+
           this.router.navigate(['/onboarding'], { replaceUrl: true });
         }
       } else {
         // Login
-        const result = await this.authService.login(formData.email, formData.password);
-        
-        if (result.userData.userType === 'provider') {
+        const resultado = await this.servicioAutenticacion.iniciarSesion(formData.email, formData.password);
+
+        if (resultado.datosUsuario?.userType === 'provider') {
           this.router.navigate(['/proveedores/panel'], { replaceUrl: true });
         } else {
           this.router.navigate(['/tabs/mascotas'], { replaceUrl: true });
@@ -416,12 +416,12 @@ export class AuthPage {
   async loginWithGoogle() {
     try {
       this.isLoading = true;
-      const result = await this.authService.loginWithGoogle();
-      
-      if (result.isNewUser) {
+      const resultado = await this.servicioAutenticacion.iniciarSesionConGoogle();
+
+      if (resultado.esUsuarioNuevo) {
         this.router.navigate(['/onboarding'], { replaceUrl: true });
       } else {
-        if (result.userData.userType === 'provider') {
+        if (resultado.datosUsuario?.userType === 'provider') {
           this.router.navigate(['/proveedores/panel'], { replaceUrl: true });
         } else {
           this.router.navigate(['/tabs/mascotas'], { replaceUrl: true });
@@ -437,12 +437,12 @@ export class AuthPage {
   async loginWithFacebook() {
     try {
       this.isLoading = true;
-      const result = await this.authService.loginWithFacebook();
-      
-      if (result.isNewUser) {
+      const resultado = await this.servicioAutenticacion.iniciarSesionConFacebook();
+
+      if (resultado.esUsuarioNuevo) {
         this.router.navigate(['/onboarding'], { replaceUrl: true });
       } else {
-        if (result.userData.userType === 'provider') {
+        if (resultado.datosUsuario?.userType === 'provider') {
           this.router.navigate(['/proveedores/panel'], { replaceUrl: true });
         } else {
           this.router.navigate(['/tabs/mascotas'], { replaceUrl: true });

@@ -25,9 +25,9 @@ import {
   IonButtons,
   IonList
 } from '@ionic/angular/standalone';
-import { AuthService } from '@nucleo/servicios/auth.service';
-import { DataService } from '@nucleo/servicios/data.service';
-import { User, Pet } from '@compartido/modelos/user.model';
+import { ServicioAutenticacion } from '@nucleo/firebase';
+import { ServicioAccesoDatosMascotas } from '@funcionalidades/mascotas/servicios';
+import { Mascota } from '@compartido/modelos';
 import { addIcons } from 'ionicons';
 import { 
   addOutline, 
@@ -555,12 +555,12 @@ import { Observable } from 'rxjs';
   ]
 })
 export class PetsPage implements OnInit {
-  private authService = inject(AuthService);
-  private dataService = inject(DataService);
+  private servicioAutenticacion = inject(ServicioAutenticacion);
+  private servicioAccesoDatosMascotas = inject(ServicioAccesoDatosMascotas);
   private router = inject(Router);
 
-  currentUser$ = this.authService.currentUser$;
-  pets$!: Observable<Pet[]>;
+  currentUser$ = this.servicioAutenticacion.usuarioActual$;
+  pets$!: Observable<Mascota[]>;
   isLoading = true;
   showProfileModal = false;
 
@@ -579,7 +579,7 @@ export class PetsPage implements OnInit {
   loadUserPets() {
     this.currentUser$.subscribe(user => {
       if (user) {
-        this.pets$ = this.dataService.getUserPets(user.uid);
+        this.pets$ = this.servicioAccesoDatosMascotas.obtenerMascotas(user.uid);
         this.pets$.subscribe(() => {
           this.isLoading = false;
         });
@@ -598,7 +598,7 @@ export class PetsPage implements OnInit {
     this.router.navigate(['/mascotas/formulario']);
   }
 
-  editPet(pet: Pet) {
+  editPet(pet: Mascota) {
     this.router.navigate(['/mascotas/formulario'], { state: { pet } });
   }
 
@@ -610,7 +610,7 @@ export class PetsPage implements OnInit {
     this.router.navigate(['/tabs/citas']);
   }
 
-  bookAppointmentForPet(pet: Pet) {
+  bookAppointmentForPet(pet: Mascota) {
     this.router.navigate(['/citas/formulario'], { state: { pet } });
   }
 
@@ -619,7 +619,7 @@ export class PetsPage implements OnInit {
     this.router.navigate(['/tabs/proveedores'], { queryParams: { nearby: true } });
   }
 
-  viewPetProfile(pet: Pet) {
+  viewPetProfile(pet: Mascota) {
     // Navigate to detailed pet profile
     this.router.navigate(['/mascotas/formulario'], { state: { pet, viewOnly: true } });
   }
