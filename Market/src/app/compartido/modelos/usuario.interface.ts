@@ -4,7 +4,7 @@ export interface Usuario {
   email: string;
   phone: string;
   location: string;
-  planType: 'Básico' | 'Premium' | 'Familiar';
+  planType: 'Básico' | 'Premium';
   userType: 'client' | 'provider';
   businessName?: string;
   services?: string[];
