@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ServicioAccesoDatosProveedores } from './acceso-datos-proveedores.service';
 import { ServicioDatos } from '@nucleo/firebase';
-import { SimuladorFirestore, SimuladorTimestamp } from '@testing';
+
 import { firstValueFrom, from, map } from 'rxjs';
 import { Proveedor, CategoriaServicio } from '@compartido/modelos';
 
