@@ -24,8 +24,8 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { callOutline, locationOutline, personCircleOutline, saveOutline, logOutOutline } from 'ionicons/icons';
-import { AuthService } from '@nucleo/servicios/auth.service';
-import { User } from '@compartido/modelos/user.model';
+import { ServicioAutenticacion } from '@nucleo/firebase';
+import { Usuario } from '@compartido/modelos';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -200,12 +200,12 @@ import { Subscription } from 'rxjs';
   `]
 })
 export class ProfilePage implements OnInit, OnDestroy {
-  private authService = inject(AuthService);
+  private servicioAutenticacion = inject(ServicioAutenticacion);
   private fb = inject(FormBuilder);
   private router = inject(Router);
 
   profileForm: FormGroup;
-  currentUser: User | null = null;
+  currentUser: Usuario | null = null;
   isSaving = false;
   toastOpen = false;
   toastMessage = '';
@@ -226,7 +226,7 @@ export class ProfilePage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const sub = this.authService.currentUser$.subscribe(user => {
+    const sub = this.servicioAutenticacion.usuarioActual$.subscribe(user => {
       this.currentUser = user;
       if (user) {
         this.profileForm.patchValue({
@@ -259,7 +259,7 @@ export class ProfilePage implements OnInit, OnDestroy {
 
     try {
       const value = this.profileForm.value;
-      await this.authService.updateUserProfile(this.currentUser.uid, {
+      await this.servicioAutenticacion.actualizarPerfilUsuario(this.currentUser.uid, {
         name: value.name,
         phone: value.phone,
         location: value.location,
@@ -277,7 +277,7 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   async logout() {
     try {
-      await this.authService.logout();
+      await this.servicioAutenticacion.cerrarSesion();
       this.router.navigate(['/autenticacion'], { replaceUrl: true });
     } catch (error) {
       console.error('Logout error', error);

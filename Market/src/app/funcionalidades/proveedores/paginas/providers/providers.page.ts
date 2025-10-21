@@ -7,8 +7,8 @@ import {
   IonGrid, IonRow, IonCol, IonAvatar, IonFab, IonFabButton,
   IonRefresher, IonRefresherContent
 } from '@ionic/angular/standalone';
-import { DataService } from '@nucleo/servicios/data.service';
-import { Provider } from '@compartido/modelos/user.model';
+import { ServicioAccesoDatosProveedores } from '@funcionalidades/proveedores/servicios';
+import { Proveedor, CategoriaServicio } from '@compartido/modelos';
 import { addIcons } from 'ionicons';
 import {
   searchOutline, filterOutline, starOutline, locationOutline,
@@ -309,13 +309,13 @@ import { FormsModule } from '@angular/forms';
   ]
 })
 export class ProvidersPage implements OnInit {
-  private dataService = inject(DataService);
+  private servicioAccesoDatosProveedores = inject(ServicioAccesoDatosProveedores);
   private router = inject(Router);
 
-  providers$!: Observable<Provider[]>;
+  providers$!: Observable<Proveedor[]>;
   searchTerm = '';
   selectedCategory = '';
-  serviceCategories: any[] = [];
+  serviceCategories: CategoriaServicio[] = [];
 
   constructor() {
     addIcons({ 
@@ -326,11 +326,11 @@ export class ProvidersPage implements OnInit {
 
   ngOnInit() {
     this.loadProviders();
-    this.serviceCategories = this.dataService.getServiceCategories();
+    this.serviceCategories = this.servicioAccesoDatosProveedores.obtenerCategoriasServicio();
   }
 
   loadProviders() {
-    this.providers$ = this.dataService.getProviders(this.selectedCategory);
+    this.providers$ = this.servicioAccesoDatosProveedores.obtenerProveedores(this.selectedCategory);
   }
 
   refreshData(event: any) {
@@ -350,17 +350,17 @@ export class ProvidersPage implements OnInit {
     this.loadProviders();
   }
 
-  viewProvider(provider: Provider) {
+  viewProvider(provider: Proveedor) {
     // Navigate to provider detail page
     console.log('View provider:', provider);
   }
 
-  contactProvider(provider: Provider) {
+  contactProvider(provider: Proveedor) {
     // Open contact options
     console.log('Contact provider:', provider);
   }
 
-  bookProvider(provider: Provider) {
+  bookProvider(provider: Proveedor) {
     this.router.navigate(['/citas/formulario'], { state: { provider } });
   }
 

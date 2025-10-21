@@ -22,9 +22,11 @@
     "useDefineForClassFields": false,
     "paths": {
       "@nucleo/*": ["app/nucleo/*"],
-      "@nucleo/servicios/*": ["app/nucleo/servicios/*"],
+      "@nucleo/firebase": ["app/nucleo/firebase/index.ts"],
+      "@nucleo/firebase/*": ["app/nucleo/firebase/*"],
       "@nucleo/guardias/*": ["app/nucleo/guardias/*"],
       "@compartido/*": ["app/compartido/*"],
+      "@compartido/modelos": ["app/compartido/modelos/index.ts"],
       "@compartido/modelos/*": ["app/compartido/modelos/*"],
       "@funcionalidades/*": ["app/funcionalidades/*"]
     }

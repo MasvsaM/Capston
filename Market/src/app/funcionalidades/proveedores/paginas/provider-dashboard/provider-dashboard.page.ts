@@ -24,9 +24,10 @@ import {
   chatbubbleOutline,
   pencilOutline
 } from 'ionicons/icons';
-import { AuthService } from '@nucleo/servicios/auth.service';
-import { DataService } from '@nucleo/servicios/data.service';
-import { Appointment, Provider } from '@compartido/modelos/user.model';
+import { ServicioAutenticacion } from '@nucleo/firebase';
+import { ServicioAccesoDatosProveedores } from '@funcionalidades/proveedores/servicios';
+import { ServicioAccesoDatosCitas } from '@funcionalidades/citas/servicios';
+import { Cita, Proveedor } from '@compartido/modelos';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
@@ -330,12 +331,13 @@ import { Observable, Subscription } from 'rxjs';
   `]
 })
 export class ProviderDashboardPage implements OnInit, OnDestroy {
-  private authService = inject(AuthService);
-  private dataService = inject(DataService);
+  private servicioAutenticacion = inject(ServicioAutenticacion);
+  private servicioAccesoDatosProveedores = inject(ServicioAccesoDatosProveedores);
+  private servicioAccesoDatosCitas = inject(ServicioAccesoDatosCitas);
   private router = inject(Router);
 
-  provider$!: Observable<Provider | null>;
-  upcomingAppointments$!: Observable<Appointment[]>;
+  provider$!: Observable<Proveedor | null>;
+  upcomingAppointments$!: Observable<Cita[]>;
   defaultImage = 'https://images.unsplash.com/photo-1558944351-dae1be1f4436?w=100&h=100&fit=crop';
 
   private subscription = new Subscription();
@@ -345,10 +347,10 @@ export class ProviderDashboardPage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const sub = this.authService.currentUser$.subscribe(user => {
+    const sub = this.servicioAutenticacion.usuarioActual$.subscribe(user => {
       if (user) {
-        this.provider$ = this.dataService.getProvider(user.uid);
-        this.upcomingAppointments$ = this.dataService.getProviderAppointments(user.uid);
+        this.provider$ = this.servicioAccesoDatosProveedores.obtenerProveedor(user.uid);
+        this.upcomingAppointments$ = this.servicioAccesoDatosCitas.obtenerCitasDeProveedor(user.uid);
       }
     });
     this.subscription.add(sub);
@@ -371,12 +373,12 @@ export class ProviderDashboardPage implements OnInit, OnDestroy {
     this.router.navigate(['/perfil']);
   }
 
-  contactClient(_appointment: Appointment) {
+  contactClient(_appointment: Cita) {
     // Placeholder for communication integration
     console.log('Contact client');
   }
 
-  messageClient(_appointment: Appointment) {
+  messageClient(_appointment: Cita) {
     console.log('Message client');
   }
 }

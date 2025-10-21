@@ -25,8 +25,9 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { briefcaseOutline, businessOutline, locationOutline, cashOutline } from 'ionicons/icons';
-import { AuthService } from '@nucleo/servicios/auth.service';
-import { DataService } from '@nucleo/servicios/data.service';
+import { ServicioAutenticacion } from '@nucleo/firebase';
+import { ServicioAccesoDatosProveedores } from '@funcionalidades/proveedores/servicios';
+import { CategoriaServicio } from '@compartido/modelos';
 
 interface ProviderRegistrationState {
   email: string;
@@ -250,8 +251,8 @@ interface ProviderRegistrationState {
 export class ProviderRegistrationPage implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private authService = inject(AuthService);
-  private dataService = inject(DataService);
+  private servicioAutenticacion = inject(ServicioAutenticacion);
+  private servicioAccesoDatosProveedores = inject(ServicioAccesoDatosProveedores);
 
   registrationForm: FormGroup;
   isSubmitting = false;
@@ -259,7 +260,7 @@ export class ProviderRegistrationPage implements OnInit {
   toastMessage = '';
   providerState?: ProviderRegistrationState;
 
-  serviceCategories = this.dataService.getServiceCategories();
+  serviceCategories: CategoriaServicio[] = this.servicioAccesoDatosProveedores.obtenerCategoriasServicio();
 
   constructor() {
     addIcons({ briefcaseOutline, businessOutline, locationOutline, cashOutline });
@@ -296,7 +297,7 @@ export class ProviderRegistrationPage implements OnInit {
       const formValue = this.registrationForm.value;
       const { email, password, name, phone } = this.providerState;
 
-      const result = await this.authService.register(email, password, {
+      const resultado = await this.servicioAutenticacion.registrar(email, password, {
         name,
         phone,
         userType: 'provider',
@@ -305,8 +306,13 @@ export class ProviderRegistrationPage implements OnInit {
         services: formValue.services
       });
 
-      await this.dataService.createProvider({
-        userId: result.user.uid,
+      const uid = resultado.usuario?.uid;
+      if (!uid) {
+        throw new Error('No se pudo obtener el identificador del usuario.');
+      }
+
+      await this.servicioAccesoDatosProveedores.registrarProveedor({
+        userId: uid,
         name,
         profession: formValue.profession,
         specialties: formValue.services,

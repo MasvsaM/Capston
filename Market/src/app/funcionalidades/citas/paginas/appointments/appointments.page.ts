@@ -6,9 +6,9 @@ import {
   IonButton, IonIcon, IonChip, IonLabel, IonGrid, IonRow, IonCol,
   IonAvatar, IonRefresher, IonRefresherContent, IonFab, IonFabButton
 } from '@ionic/angular/standalone';
-import { AuthService } from '@nucleo/servicios/auth.service';
-import { DataService } from '@nucleo/servicios/data.service';
-import { Appointment } from '@compartido/modelos/user.model';
+import { ServicioAutenticacion } from '@nucleo/firebase';
+import { ServicioAccesoDatosCitas } from '@funcionalidades/citas/servicios';
+import { Cita } from '@compartido/modelos';
 import { addIcons } from 'ionicons';
 import { 
   addOutline, calendarOutline, callOutline, chatbubbleOutline,
@@ -394,11 +394,11 @@ import { Observable } from 'rxjs';
   ]
 })
 export class AppointmentsPage implements OnInit {
-  private authService = inject(AuthService);
-  private dataService = inject(DataService);
+  private servicioAutenticacion = inject(ServicioAutenticacion);
+  private servicioAccesoDatosCitas = inject(ServicioAccesoDatosCitas);
   private router = inject(Router);
 
-  appointments$!: Observable<Appointment[]>;
+  appointments$!: Observable<Cita[]>;
   upcomingCount = 2;
   completedCount = 8;
 
@@ -415,9 +415,9 @@ export class AppointmentsPage implements OnInit {
   }
 
   loadAppointments() {
-    this.authService.currentUser$.subscribe(user => {
+    this.servicioAutenticacion.usuarioActual$.subscribe(user => {
       if (user) {
-        this.appointments$ = this.dataService.getUserAppointments(user.uid);
+        this.appointments$ = this.servicioAccesoDatosCitas.obtenerCitasDeUsuario(user.uid);
       }
     });
   }
@@ -433,15 +433,15 @@ export class AppointmentsPage implements OnInit {
     this.router.navigate(['/tabs/proveedores']);
   }
 
-  callProvider(appointment: Appointment) {
+  callProvider(appointment: Cita) {
     console.log('Call provider:', appointment.providerName);
   }
 
-  messageProvider(appointment: Appointment) {
+  messageProvider(appointment: Cita) {
     console.log('Message provider:', appointment.providerName);
   }
 
-  rescheduleAppointment(appointment: Appointment) {
+  rescheduleAppointment(appointment: Cita) {
     console.log('Reschedule appointment:', appointment.id);
   }
 

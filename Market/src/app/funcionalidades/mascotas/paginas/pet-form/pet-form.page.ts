@@ -24,13 +24,13 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { pawOutline, saveOutline, trashOutline } from 'ionicons/icons';
-import { AuthService } from '@nucleo/servicios/auth.service';
-import { DataService } from '@nucleo/servicios/data.service';
-import { Pet } from '@compartido/modelos/user.model';
+import { ServicioAutenticacion } from '@nucleo/firebase';
+import { ServicioAccesoDatosMascotas } from '@funcionalidades/mascotas/servicios';
+import { Mascota } from '@compartido/modelos';
 import { firstValueFrom } from 'rxjs';
 
 interface PetFormState {
-  pet?: Pet;
+  pet?: Mascota;
   viewOnly?: boolean;
 }
 
@@ -202,8 +202,8 @@ interface PetFormState {
 export class PetFormPage implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private authService = inject(AuthService);
-  private dataService = inject(DataService);
+  private servicioAutenticacion = inject(ServicioAutenticacion);
+  private servicioAccesoDatosMascotas = inject(ServicioAccesoDatosMascotas);
 
   petForm: FormGroup;
   isSubmitting = false;
@@ -212,7 +212,7 @@ export class PetFormPage implements OnInit {
   toastColor: 'success' | 'danger' = 'success';
   isEdit = false;
   viewOnly = false;
-  currentPet?: Pet;
+  currentPet?: Mascota;
 
   constructor() {
     addIcons({ pawOutline, saveOutline, trashOutline });
@@ -261,13 +261,13 @@ export class PetFormPage implements OnInit {
     this.isSubmitting = true;
 
     try {
-      const user = await firstValueFrom(this.authService.currentUser$);
+      const user = await firstValueFrom(this.servicioAutenticacion.usuarioActual$);
       if (!user) {
         throw new Error('Usuario no autenticado');
       }
 
       const formValue = this.petForm.value;
-      const payload: Omit<Pet, 'id' | 'createdAt' | 'updatedAt'> = {
+      const payload: Omit<Mascota, 'id' | 'createdAt' | 'updatedAt'> = {
         name: formValue.name,
         species: formValue.species,
         breed: formValue.breed,
@@ -282,10 +282,10 @@ export class PetFormPage implements OnInit {
       };
 
       if (this.isEdit && this.currentPet?.id) {
-        await this.dataService.updatePet(this.currentPet.id, payload);
+        await this.servicioAccesoDatosMascotas.actualizarMascota(this.currentPet.id, payload);
         this.presentToast('Mascota actualizada correctamente.', 'success');
       } else {
-        await this.dataService.createPet(payload);
+        await this.servicioAccesoDatosMascotas.registrarMascota(payload);
         this.presentToast('Mascota registrada correctamente.', 'success');
       }
 
@@ -306,7 +306,7 @@ export class PetFormPage implements OnInit {
     this.isSubmitting = true;
 
     try {
-      await this.dataService.deletePet(this.currentPet.id);
+      await this.servicioAccesoDatosMascotas.eliminarMascota(this.currentPet.id);
       this.presentToast('Mascota eliminada.', 'success');
       this.router.navigate(['/tabs/mascotas'], { replaceUrl: true });
     } catch (error) {

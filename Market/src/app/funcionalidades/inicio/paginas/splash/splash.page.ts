@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
-import { AuthService } from '@nucleo/servicios/auth.service';
+import { ServicioAutenticacion } from '@nucleo/firebase';
 
 @Component({
   selector: 'app-splash',
@@ -137,7 +137,7 @@ import { AuthService } from '@nucleo/servicios/auth.service';
 })
 export class SplashPage implements OnInit {
   private router = inject(Router);
-  private authService = inject(AuthService);
+  private servicioAutenticacion = inject(ServicioAutenticacion);
 
   ngOnInit() {
     // Wait for 3 seconds then check authentication
@@ -147,10 +147,10 @@ export class SplashPage implements OnInit {
   }
 
   private checkAuthAndNavigate() {
-    this.authService.user$.subscribe(user => {
+    this.servicioAutenticacion.estadoAutenticacion$.subscribe(user => {
       if (user) {
         // User is authenticated, get user data and navigate accordingly
-        this.authService.currentUser$.subscribe(userData => {
+        this.servicioAutenticacion.usuarioActual$.subscribe(userData => {
           if (userData) {
             if (userData.userType === 'provider') {
               this.router.navigate(['/proveedores/panel'], { replaceUrl: true });

@@ -25,14 +25,14 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { calendarOutline, medkitOutline, personOutline, pawOutline } from 'ionicons/icons';
-import { AuthService } from '@nucleo/servicios/auth.service';
-import { DataService } from '@nucleo/servicios/data.service';
-import { Appointment, Pet, Provider } from '@compartido/modelos/user.model';
+import { ServicioAutenticacion } from '@nucleo/firebase';
+import { ServicioAccesoDatosCitas } from '@funcionalidades/citas/servicios';
+import { Cita, Mascota, Proveedor } from '@compartido/modelos';
 import { Subscription, firstValueFrom } from 'rxjs';
 
 interface AppointmentState {
-  pet?: Pet;
-  provider?: Provider;
+  pet?: Mascota;
+  provider?: Proveedor;
 }
 
 @Component({
@@ -196,12 +196,12 @@ interface AppointmentState {
 export class AppointmentFormPage implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private authService = inject(AuthService);
-  private dataService = inject(DataService);
+  private servicioAutenticacion = inject(ServicioAutenticacion);
+  private servicioAccesoDatosCitas = inject(ServicioAccesoDatosCitas);
 
   appointmentForm: FormGroup;
-  pets: Pet[] = [];
-  providers: Provider[] = [];
+  pets: Mascota[] = [];
+  providers: Proveedor[] = [];
   isSubmitting = false;
   toastOpen = false;
   toastMessage = '';
@@ -226,9 +226,9 @@ export class AppointmentFormPage implements OnInit, OnDestroy {
     const historyState = history.state as AppointmentState | undefined;
     const state = navState?.pet || navState?.provider ? navState : historyState;
 
-    const sub = this.authService.currentUser$.subscribe(user => {
+    const sub = this.servicioAutenticacion.usuarioActual$.subscribe(user => {
       if (user) {
-        const petsSub = this.dataService.getUserPets(user.uid).subscribe(pets => {
+        const petsSub = this.servicioAccesoDatosCitas.obtenerMascotasDeUsuario(user.uid).subscribe(pets => {
           this.pets = pets;
           if (state?.pet) {
             this.appointmentForm.patchValue({ petId: state.pet.id });
@@ -236,7 +236,7 @@ export class AppointmentFormPage implements OnInit, OnDestroy {
         });
         this.subscription.add(petsSub);
 
-        const providersSub = this.dataService.getProviders().subscribe(providers => {
+        const providersSub = this.servicioAccesoDatosCitas.obtenerProveedores().subscribe(providers => {
           this.providers = providers;
           if (state?.provider) {
             this.appointmentForm.patchValue({ providerId: state.provider.id });
@@ -260,7 +260,7 @@ export class AppointmentFormPage implements OnInit, OnDestroy {
       return;
     }
 
-    const user = await firstValueFrom(this.authService.currentUser$);
+    const user = await firstValueFrom(this.servicioAutenticacion.usuarioActual$);
     if (!user) {
       this.toastMessage = 'Debes iniciar sesión para agendar una cita.';
       this.toastOpen = true;
@@ -279,7 +279,7 @@ export class AppointmentFormPage implements OnInit, OnDestroy {
       }
 
       const date = new Date(dateTime);
-      const appointment: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt'> = {
+      const appointment: Omit<Cita, 'id' | 'createdAt' | 'updatedAt'> = {
         petId,
         petName: selectedPet.name,
         providerId,
@@ -295,7 +295,7 @@ export class AppointmentFormPage implements OnInit, OnDestroy {
         notes
       };
 
-      await this.dataService.createAppointment(appointment);
+      await this.servicioAccesoDatosCitas.registrarCita(appointment);
       this.router.navigate(['/tabs/citas'], { replaceUrl: true });
     } catch (error) {
       console.error('Error creating appointment', error);
