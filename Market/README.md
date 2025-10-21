@@ -11,3 +11,4 @@ Para validar los cambios recientes se ejecutaron los siguientes comandos desde l
 Los dos primeros comandos permiten asegurar que las pruebas unitarias (incluidos los nuevos escenarios para el panel de proveedores y el servicio de acceso a datos) pasan correctamente y que la aplicación compila sin errores.
 
 `ionic serve --no-open` inicia el servidor de desarrollo de Ionic sin abrir el navegador automáticamente. Es útil para verificar que la aplicación arranca adecuadamente; finaliza el proceso con `Ctrl+C` cuando ya no se necesite.
+

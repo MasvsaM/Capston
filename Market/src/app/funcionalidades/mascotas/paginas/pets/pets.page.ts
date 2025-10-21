@@ -639,7 +639,7 @@ export class PetsPage implements OnInit {
 
   async logout() {
     try {
-      await this.authService.logout();
+      await this.servicioAutenticacion.cerrarSesion();
       this.router.navigate(['/autenticacion'], { replaceUrl: true });
     } catch (error) {
       console.error('Logout error:', error);
