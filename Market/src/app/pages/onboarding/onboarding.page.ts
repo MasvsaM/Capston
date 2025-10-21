@@ -58,9 +58,10 @@ import { FormsModule } from '@angular/forms';
             <ion-card class="permission-card">
               <ion-card-content>
                 <div class="permission-item">
-                  <ion-checkbox 
-                    [(ngModel)]="permissions.notifications" 
-                    color="primary">
+                  <ion-checkbox
+                    [(ngModel)]="permissions.notifications"
+                    color="primary"
+                    (ionChange)="handlePermissionToggle()">
                   </ion-checkbox>
                   <div class="permission-info">
                     <ion-icon name="notifications-outline" color="primary"></ion-icon>
@@ -72,9 +73,10 @@ import { FormsModule } from '@angular/forms';
                 </div>
                 
                 <div class="permission-item">
-                  <ion-checkbox 
-                    [(ngModel)]="permissions.location" 
-                    color="primary">
+                  <ion-checkbox
+                    [(ngModel)]="permissions.location"
+                    color="primary"
+                    (ionChange)="handlePermissionToggle()">
                   </ion-checkbox>
                   <div class="permission-info">
                     <ion-icon name="location-outline" color="primary"></ion-icon>
@@ -345,33 +347,45 @@ export class OnboardingPage implements OnInit {
 
   currentStep = 0;
   steps = [0, 1, 2];
-  
+
   permissions = {
     notifications: false,
     location: false
   };
 
   constructor() {
-    addIcons({ 
+    addIcons({
       pawOutline, heartOutline, starOutline, shieldCheckmarkOutline,
       notificationsOutline, locationOutline, chevronForwardOutline
     });
   }
 
-  ngOnInit() {
-    // Request permissions if granted in step 2
+  ngOnInit(): void {
+    this.restoreSavedPermissions();
+    this.restoreProgress();
+  }
+
+  ionViewWillEnter(): void {
+    const onboardingCompleted = localStorage.getItem('onboarding_completed') === 'true';
+    if (onboardingCompleted) {
+      this.router.navigate(['/tabs/pets'], { replaceUrl: true });
+    }
   }
 
   nextStep() {
     if (this.currentStep < this.steps.length - 1) {
       this.currentStep++;
+      this.persistCurrentStep();
     }
   }
 
   completeOnboarding() {
     // Save onboarding completion status
     localStorage.setItem('onboarding_completed', 'true');
-    
+
+    this.persistPermissions();
+    this.persistCurrentStep(2);
+
     // Request permissions if user accepted them
     if (this.permissions.notifications) {
       this.requestNotificationPermission();
@@ -380,9 +394,32 @@ export class OnboardingPage implements OnInit {
     if (this.permissions.location) {
       this.requestLocationPermission();
     }
-    
+
     // Navigate to main app
     this.router.navigate(['/tabs/pets'], { replaceUrl: true });
+  }
+
+  handlePermissionToggle(): void {
+    this.persistPermissions();
+  }
+
+  private restoreProgress(): void {
+    const storedStep = localStorage.getItem('onboarding_current_step');
+    if (storedStep === null) {
+      return;
+    }
+
+    const parsedStep = Number.parseInt(storedStep, 10);
+    if (Number.isNaN(parsedStep)) {
+      localStorage.removeItem('onboarding_current_step');
+      return;
+    }
+
+    this.currentStep = this.steps.includes(parsedStep) ? parsedStep : 0;
+  }
+
+  private persistCurrentStep(step: number = this.currentStep): void {
+    localStorage.setItem('onboarding_current_step', String(step));
   }
 
   private async requestNotificationPermission() {
@@ -402,5 +439,26 @@ export class OnboardingPage implements OnInit {
         }
       );
     }
+  }
+
+  private restoreSavedPermissions(): void {
+    const stored = localStorage.getItem('onboarding_permissions');
+    if (!stored) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(stored) as Partial<typeof this.permissions>;
+      this.permissions = {
+        notifications: parsed.notifications ?? this.permissions.notifications,
+        location: parsed.location ?? this.permissions.location,
+      };
+    } catch {
+      localStorage.removeItem('onboarding_permissions');
+    }
+  }
+
+  private persistPermissions(): void {
+    localStorage.setItem('onboarding_permissions', JSON.stringify(this.permissions));
   }
 }

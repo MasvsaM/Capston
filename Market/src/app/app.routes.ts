@@ -35,6 +35,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/provider-dashboard/provider-dashboard.page').then(m => m.ProviderDashboardPage),
   },
   {
+    path: 'proveedores',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./funcionalidades/proveedores/proveedores.module').then(m => m.ProveedoresModule),
+  },
+  {
     path: 'tabs',
     canActivate: [AuthGuard],
     loadComponent: () => import('./pages/tabs/tabs.page').then(m => m.TabsPage),

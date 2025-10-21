@@ -1,0 +1,16 @@
+.pedidos-content {
+  --background: var(--ion-color-light);
+}
+
+ion-item {
+  align-items: flex-start;
+
+  h2 {
+    margin: 0 0 0.25rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+  }
+}
