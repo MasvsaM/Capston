@@ -371,8 +371,10 @@ export class OnboardingPage implements OnInit {
   }
 
   completeOnboarding() {
-    // Save onboarding completion status
-    localStorage.setItem('onboarding_completed', 'true');
+    // Save onboarding completion status when storage is available
+    if (this.isStorageAvailable()) {
+      localStorage.setItem('onboarding_completed', 'true');
+    }
 
     this.persistPermissions();
 
@@ -413,6 +415,10 @@ export class OnboardingPage implements OnInit {
   }
 
   private restoreSavedPermissions(): void {
+    if (!this.isStorageAvailable()) {
+      return;
+    }
+
     const stored = localStorage.getItem('onboarding_permissions');
     if (!stored) {
       return;
@@ -430,6 +436,21 @@ export class OnboardingPage implements OnInit {
   }
 
   private persistPermissions(): void {
+    if (!this.isStorageAvailable()) {
+      return;
+    }
+
     localStorage.setItem('onboarding_permissions', JSON.stringify(this.permissions));
+  }
+
+  private isStorageAvailable(): boolean {
+    try {
+      const testKey = '__onboarding_test__';
+      localStorage.setItem(testKey, '1');
+      localStorage.removeItem(testKey);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
