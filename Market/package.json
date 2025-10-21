@@ -9,7 +9,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "formatear": "prettier --write \"src/**/*.{ts,html,scss}\"",
+    "formatear:verificar": "prettier --check \"src/**/*.{ts,html,scss}\"",
+    "pruebas": "ng test --watch=false",
+    "pruebas:coverage": "ng test --watch=false --code-coverage"
   },
   "private": true,
   "dependencies": {
