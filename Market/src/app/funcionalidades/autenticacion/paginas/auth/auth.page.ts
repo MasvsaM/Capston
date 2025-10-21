@@ -14,266 +14,456 @@ import {
   IonCheckbox,
   IonSegment,
   IonSegmentButton,
-  IonToast
+  IonToast,
+  IonChip
 } from '@ionic/angular/standalone';
 import { ServicioAutenticacion } from '@nucleo/firebase';
 import { addIcons } from 'ionicons';
-import { logoGoogle, logoFacebook, eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, personOutline, callOutline } from 'ionicons/icons';
+import {
+  logoGoogle,
+  logoFacebook,
+  eyeOutline,
+  eyeOffOutline,
+  mailOutline,
+  lockClosedOutline,
+  personOutline,
+  callOutline,
+  chatbubblesOutline,
+  bulbOutline,
+  shieldCheckmarkOutline,
+  pawOutline,
+  calendarOutline,
+  heartOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-auth',
   template: `
     <ion-content class="auth-content">
-      <div class="auth-container">
-        <!-- Logo Section -->
-        <div class="logo-section">
-          <div class="logo-icon">🐾</div>
-          <h1>MarketPet</h1>
-          <p>Conecta con los mejores servicios para tu mascota</p>
-        </div>
+      <div class="blur-circle circle-1"></div>
+      <div class="blur-circle circle-2"></div>
 
-        <!-- User Type Selector -->
-        <ion-segment [(ngModel)]="userType" class="user-type-segment">
-          <ion-segment-button value="client">
-            <ion-label>Cliente</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="provider">
-            <ion-label>Proveedor</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-
-        <!-- Auth Form -->
-        <ion-card class="auth-card">
-          <ion-card-content>
-            <!-- Toggle between Login/Register -->
-            <div class="form-toggle">
-              <button 
-                class="toggle-btn" 
-                [class.active]="!isRegister"
-                (click)="toggleForm(false)">
-                Iniciar Sesión
-              </button>
-              <button 
-                class="toggle-btn" 
-                [class.active]="isRegister"
-                (click)="toggleForm(true)">
-                Registrarse
-              </button>
+      <div class="auth-wrapper">
+        <section class="promo-panel">
+          <div class="logo-cluster">
+            <div class="logo-icon">🐾</div>
+            <div>
+              <h1>MarketPet</h1>
+              <p>Tu plataforma integral para el cuidado de mascotas</p>
             </div>
+          </div>
 
-            <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
-              <!-- Name field (only for register) -->
-              <ion-item *ngIf="isRegister" class="form-item">
-                <ion-icon name="person-outline" slot="start"></ion-icon>
-                <ion-label position="stacked">Nombre completo</ion-label>
-                <ion-input 
-                  type="text" 
-                  formControlName="name"
-                  placeholder="Ingresa tu nombre">
-                </ion-input>
-              </ion-item>
+          <div class="promo-chips">
+            <ion-chip color="light">
+              <ion-icon name="chatbubbles-outline"></ion-icon>
+              <ion-label>Foros premium</ion-label>
+            </ion-chip>
+            <ion-chip color="light">
+              <ion-icon name="bulb-outline"></ion-icon>
+              <ion-label>IA para tu mascota (pronto)</ion-label>
+            </ion-chip>
+            <ion-chip color="light">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <ion-label>Seguridad en cada paso</ion-label>
+            </ion-chip>
+          </div>
 
-              <!-- Phone field (only for register) -->
-              <ion-item *ngIf="isRegister" class="form-item">
-                <ion-icon name="call-outline" slot="start"></ion-icon>
-                <ion-label position="stacked">Teléfono</ion-label>
-                <ion-input 
-                  type="tel" 
-                  formControlName="phone"
-                  placeholder="+56 9 1234 5678">
-                </ion-input>
-              </ion-item>
-
-              <!-- Email field -->
-              <ion-item class="form-item">
-                <ion-icon name="mail-outline" slot="start"></ion-icon>
-                <ion-label position="stacked">Email</ion-label>
-                <ion-input 
-                  type="email" 
-                  formControlName="email"
-                  placeholder="tu@email.com">
-                </ion-input>
-              </ion-item>
-
-              <!-- Password field -->
-              <ion-item class="form-item">
-                <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
-                <ion-label position="stacked">Contraseña</ion-label>
-                <ion-input 
-                  [type]="showPassword ? 'text' : 'password'"
-                  formControlName="password"
-                  placeholder="••••••••">
-                </ion-input>
-                <ion-icon 
-                  [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
-                  slot="end"
-                  (click)="togglePassword()">
-                </ion-icon>
-              </ion-item>
-
-              <!-- Terms acceptance (only for register) -->
-              <div *ngIf="isRegister" class="terms-section">
-                <ion-checkbox formControlName="acceptTerms"></ion-checkbox>
-                <ion-label class="terms-label">
-                  Acepto los <a href="#" class="terms-link">términos y condiciones</a>
-                </ion-label>
+          <div class="highlight-grid">
+            <div *ngFor="let highlight of wellnessHighlights" class="highlight-card">
+              <ion-icon [name]="highlight.icon"></ion-icon>
+              <div>
+                <h3>{{ highlight.title }}</h3>
+                <p>{{ highlight.description }}</p>
               </div>
+            </div>
+          </div>
+        </section>
 
-              <!-- Submit Button -->
-              <ion-button 
-                expand="block" 
-                type="submit"
-                class="submit-btn"
-                [disabled]="!authForm.valid || isLoading">
-                {{ isLoading ? 'Cargando...' : (isRegister ? 'Crear Cuenta' : 'Iniciar Sesión') }}
-              </ion-button>
-            </form>
-
-            <!-- Divider -->
-            <div class="divider">
-              <span>o continúa con</span>
+        <section class="form-panel">
+          <div class="form-shell">
+            <div class="form-header">
+              <h2>{{ isRegister ? 'Crear una cuenta' : 'Bienvenido de nuevo' }}</h2>
+              <p>
+                Gestiona tus mascotas, descubre proveedores confiables y potencia tu experiencia con MarketPet Premium.
+              </p>
             </div>
 
-            <!-- Social Login -->
-            <div class="social-buttons">
-              <ion-button 
-                fill="outline" 
-                expand="block"
-                class="social-btn google-btn"
-                (click)="loginWithGoogle()">
-                <ion-icon name="logo-google" slot="start"></ion-icon>
-                Google
-              </ion-button>
-              
-              <ion-button 
-                fill="outline" 
-                expand="block"
-                class="social-btn facebook-btn"
-                (click)="loginWithFacebook()">
-                <ion-icon name="logo-facebook" slot="start"></ion-icon>
-                Facebook
-              </ion-button>
+            <div class="user-type-wrapper">
+              <span class="user-type-label">¿Cómo deseas usar MarketPet?</span>
+              <ion-segment class="user-type-segment" [(ngModel)]="userType">
+                <ion-segment-button value="client">
+                  <ion-label>Cliente</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="provider">
+                  <ion-label>Proveedor</ion-label>
+                </ion-segment-button>
+              </ion-segment>
             </div>
-          </ion-card-content>
-        </ion-card>
+
+            <ion-card class="auth-card glass-card">
+              <ion-card-content>
+                <div class="form-toggle">
+                  <button
+                    class="toggle-btn"
+                    [class.active]="!isRegister"
+                    (click)="toggleForm(false)">
+                    Iniciar Sesión
+                  </button>
+                  <button
+                    class="toggle-btn"
+                    [class.active]="isRegister"
+                    (click)="toggleForm(true)">
+                    Registrarse
+                  </button>
+                </div>
+
+                <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
+                  <ion-item *ngIf="isRegister" class="form-item">
+                    <ion-icon name="person-outline" slot="start"></ion-icon>
+                    <ion-label position="stacked">Nombre completo</ion-label>
+                    <ion-input
+                      type="text"
+                      formControlName="name"
+                      placeholder="Ingresa tu nombre">
+                    </ion-input>
+                  </ion-item>
+
+                  <ion-item *ngIf="isRegister" class="form-item">
+                    <ion-icon name="call-outline" slot="start"></ion-icon>
+                    <ion-label position="stacked">Teléfono</ion-label>
+                    <ion-input
+                      type="tel"
+                      formControlName="phone"
+                      placeholder="+56 9 1234 5678">
+                    </ion-input>
+                  </ion-item>
+
+                  <ion-item class="form-item">
+                    <ion-icon name="mail-outline" slot="start"></ion-icon>
+                    <ion-label position="stacked">Email</ion-label>
+                    <ion-input
+                      type="email"
+                      formControlName="email"
+                      placeholder="tu@email.com">
+                    </ion-input>
+                  </ion-item>
+
+                  <ion-item class="form-item">
+                    <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+                    <ion-label position="stacked">Contraseña</ion-label>
+                    <ion-input
+                      formControlName="password"
+                      placeholder="••••••••"
+                      [type]="showPassword ? 'text' : 'password'">
+                    </ion-input>
+                    <ion-icon
+                      slot="end"
+                      [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+                      (click)="togglePassword()">
+                    </ion-icon>
+                  </ion-item>
+
+                  <div *ngIf="isRegister" class="terms-section">
+                    <ion-checkbox formControlName="acceptTerms"></ion-checkbox>
+                    <ion-label class="terms-label">
+                      Acepto los <a href="#" class="terms-link">términos y condiciones</a>
+                    </ion-label>
+                  </div>
+
+                  <ion-button
+                    expand="block"
+                    type="submit"
+                    class="submit-btn"
+                    [disabled]="!authForm.valid || isLoading">
+                    {{ isLoading ? 'Cargando...' : (isRegister ? 'Crear Cuenta' : 'Iniciar Sesión') }}
+                  </ion-button>
+                </form>
+
+                <div class="divider">
+                  <span>o continúa con</span>
+                </div>
+
+                <div class="social-buttons">
+                  <ion-button
+                    fill="outline"
+                    expand="block"
+                    class="social-btn google-btn"
+                    (click)="loginWithGoogle()">
+                    <ion-icon name="logo-google" slot="start"></ion-icon>
+                    Google
+                  </ion-button>
+
+                  <ion-button
+                    fill="outline"
+                    expand="block"
+                    class="social-btn facebook-btn"
+                    (click)="loginWithFacebook()">
+                    <ion-icon name="logo-facebook" slot="start"></ion-icon>
+                    Facebook
+                  </ion-button>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </div>
+        </section>
       </div>
 
-      <!-- Toast for errors -->
       <ion-toast
-        [isOpen]="showToast"
-        [message]="toastMessage"
         duration="3000"
         position="top"
         color="danger"
+        [isOpen]="showToast"
+        [message]="toastMessage"
         (didDismiss)="showToast = false">
       </ion-toast>
     </ion-content>
   `,
   styles: [`
     .auth-content {
-      --background: linear-gradient(135deg, var(--ion-color-primary) 0%, #1a1a2e 100%);
+      position: relative;
+      --background: linear-gradient(140deg, #0b172d 0%, #1c3b64 45%, #295d8a 100%);
     }
 
-    .auth-container {
+    .blur-circle {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.6;
+      z-index: 0;
+    }
+
+    .circle-1 {
+      width: 320px;
+      height: 320px;
+      top: -120px;
+      right: -80px;
+      background: rgba(83, 208, 255, 0.45);
+    }
+
+    .circle-2 {
+      width: 260px;
+      height: 260px;
+      bottom: -120px;
+      left: -80px;
+      background: rgba(101, 92, 255, 0.35);
+    }
+
+    .auth-wrapper {
+      position: relative;
+      z-index: 1;
       min-height: 100vh;
-      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      padding: 3rem 1.5rem;
+      gap: 2.5rem;
+    }
+
+    .promo-panel {
+      flex: 1;
+      color: #f4f7ff;
       display: flex;
       flex-direction: column;
+      gap: 1.5rem;
       justify-content: center;
     }
 
-    .logo-section {
-      text-align: center;
-      margin-bottom: 2rem;
-      color: white;
+    .logo-cluster {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
     .logo-icon {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
+      font-size: 3.2rem;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 0.75rem;
+      border-radius: 20px;
     }
 
-    .logo-section h1 {
+    .logo-cluster h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .logo-cluster p {
+      margin: 0;
+      opacity: 0.7;
+    }
+
+    .promo-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .promo-chips ion-chip {
+      --background: rgba(255, 255, 255, 0.1);
+      --color: #f4f7ff;
+      backdrop-filter: blur(8px);
+    }
+
+    .promo-chips ion-icon {
+      margin-right: 0.4rem;
+    }
+
+    .highlight-grid {
+      display: grid;
+      gap: 1.1rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .highlight-card {
+      display: flex;
+      gap: 1rem;
+      background: rgba(12, 22, 39, 0.55);
+      border-radius: 18px;
+      padding: 1.25rem;
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .highlight-card ion-icon {
+      font-size: 1.8rem;
+      color: #53d0ff;
+    }
+
+    .highlight-card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .highlight-card p {
+      margin: 0.35rem 0 0 0;
+      opacity: 0.7;
+      font-size: 0.95rem;
+    }
+
+    .form-panel {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-shell {
+      width: 100%;
+      max-width: 460px;
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-header h2 {
+      color: #fff;
       font-size: 2rem;
       font-weight: 700;
-      margin: 0 0 0.5rem 0;
+      margin: 0;
     }
 
-    .logo-section p {
-      opacity: 0.8;
-      margin: 0;
+    .form-header p {
+      margin: 0.5rem 0 0 0;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .user-type-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .user-type-label {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
     }
 
     .user-type-segment {
-      margin-bottom: 1.5rem;
-      --background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
+      --background: rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
     }
 
-    .auth-card {
-      margin: 0;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    .glass-card {
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 18px 45px rgba(5, 15, 35, 0.35);
     }
 
     .form-toggle {
       display: flex;
-      background: var(--ion-color-light);
-      border-radius: 12px;
-      padding: 4px;
+      background: rgba(15, 26, 46, 0.4);
+      border-radius: 14px;
+      padding: 6px;
       margin-bottom: 1.5rem;
     }
 
     .toggle-btn {
       flex: 1;
-      background: none;
+      background: transparent;
       border: none;
       padding: 12px;
-      border-radius: 8px;
-      font-weight: 500;
-      color: var(--ion-color-medium);
+      border-radius: 10px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
       transition: all 0.3s ease;
     }
 
     .toggle-btn.active {
-      background: var(--ion-color-primary);
-      color: white;
+      background: linear-gradient(135deg, #53d0ff 0%, #4f6dff 100%);
+      color: #0b1326;
+      box-shadow: 0 12px 22px rgba(83, 208, 255, 0.4);
     }
 
     .form-item {
       margin-bottom: 1rem;
-      --border-radius: 12px;
-      --background: var(--ion-color-light);
+      --border-radius: 14px;
+      --background: rgba(7, 19, 40, 0.55);
+      --padding-start: 16px;
+      --inner-padding-end: 12px;
+      color: #fff;
+    }
+
+    .form-item ion-label {
+      color: rgba(255, 255, 255, 0.75) !important;
+    }
+
+    .form-item ion-input {
+      color: #fff;
     }
 
     .terms-section {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       margin: 1rem 0;
-    }
-
-    .terms-label {
-      font-size: 0.9rem;
-      color: var(--ion-color-medium);
+      color: rgba(255, 255, 255, 0.7);
     }
 
     .terms-link {
-      color: var(--ion-color-primary);
+      color: #53d0ff;
       text-decoration: none;
     }
 
     .submit-btn {
-      margin: 1.5rem 0 1rem 0;
-      --border-radius: 12px;
-      height: 48px;
+      margin: 1.75rem 0 1rem 0;
+      --border-radius: 16px;
+      --background: linear-gradient(135deg, #53d0ff 0%, #4f6dff 100%);
+      --box-shadow: 0 12px 26px rgba(83, 208, 255, 0.35);
+      height: 52px;
+      font-weight: 600;
     }
 
     .divider {
       text-align: center;
       margin: 1.5rem 0;
       position: relative;
-      color: var(--ion-color-medium);
+      color: rgba(255, 255, 255, 0.6);
     }
 
     .divider::before {
@@ -283,41 +473,70 @@ import { logoGoogle, logoFacebook, eyeOutline, eyeOffOutline, mailOutline, lockC
       left: 0;
       right: 0;
       height: 1px;
-      background: var(--ion-color-light-shade);
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .divider span {
-      background: white;
+      background: rgba(15, 24, 45, 0.85);
       padding: 0 1rem;
     }
 
     .social-buttons {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.85rem;
     }
 
     .social-btn {
-      --border-radius: 12px;
-      height: 48px;
+      --border-radius: 14px;
+      height: 50px;
+      font-weight: 600;
     }
 
     .google-btn {
-      --border-color: #db4437;
-      --color: #db4437;
+      --border-color: rgba(219, 68, 55, 0.45);
+      --color: #fff;
+      --background: rgba(219, 68, 55, 0.18);
     }
 
     .facebook-btn {
-      --border-color: #3b5998;
-      --color: #3b5998;
+      --border-color: rgba(59, 89, 152, 0.45);
+      --color: #fff;
+      --background: rgba(59, 89, 152, 0.2);
+    }
+
+    @media (max-width: 992px) {
+      .auth-wrapper {
+        flex-direction: column;
+        padding-top: 4rem;
+      }
+
+      .promo-panel,
+      .form-panel {
+        flex: unset;
+      }
+
+      .form-shell {
+        margin: 0 auto;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .highlight-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-shell {
+        max-width: 100%;
+      }
     }
   `],
   standalone: true,
   imports: [
     CommonModule,
     IonContent, IonCard, IonCardContent,
-    IonItem, IonLabel, IonInput, IonButton, IonIcon, IonCheckbox,
-    IonSegment, IonSegmentButton, IonToast, ReactiveFormsModule, FormsModule
+    IonItem, IonLabel, IonInput, IonButton, IonIcon, IonCheckbox, IonSegment, IonSegmentButton, IonToast, IonChip,
+    ReactiveFormsModule, FormsModule
   ]
 })
 export class AuthPage {
@@ -334,9 +553,42 @@ export class AuthPage {
 
   authForm: FormGroup;
 
+  wellnessHighlights = [
+    {
+      icon: 'paw-outline',
+      title: 'Seguimiento integral',
+      description: 'Centraliza información de vacunas, citas y cuidados de cada mascota en un solo lugar.'
+    },
+    {
+      icon: 'calendar-outline',
+      title: 'Recordatorios inteligentes',
+      description: 'Recibe alertas anticipadas para controles, baños y actividades clave.'
+    },
+    {
+      icon: 'heart-outline',
+      title: 'Comunidad confiable',
+      description: 'Comparte experiencias y encuentra recomendaciones de tutores y especialistas certificados.'
+    }
+  ];
+
   constructor() {
-    addIcons({ logoGoogle, logoFacebook, eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, personOutline, callOutline });
-    
+    addIcons({
+      logoGoogle,
+      logoFacebook,
+      eyeOutline,
+      eyeOffOutline,
+      mailOutline,
+      lockClosedOutline,
+      personOutline,
+      callOutline,
+      chatbubblesOutline,
+      bulbOutline,
+      shieldCheckmarkOutline,
+      pawOutline,
+      calendarOutline,
+      heartOutline
+    });
+
     this.authForm = this.fb.group({
       name: [''],
       phone: [''],
@@ -348,7 +600,7 @@ export class AuthPage {
 
   toggleForm(isRegister: boolean) {
     this.isRegister = isRegister;
-    
+
     if (isRegister) {
       this.authForm.get('name')?.setValidators([Validators.required]);
       this.authForm.get('phone')?.setValidators([Validators.required]);
@@ -358,7 +610,7 @@ export class AuthPage {
       this.authForm.get('phone')?.clearValidators();
       this.authForm.get('acceptTerms')?.clearValidators();
     }
-    
+
     this.authForm.get('name')?.updateValueAndValidity();
     this.authForm.get('phone')?.updateValueAndValidity();
     this.authForm.get('acceptTerms')?.updateValueAndValidity();
@@ -377,7 +629,6 @@ export class AuthPage {
     try {
       if (this.isRegister) {
         if (this.userType === 'provider') {
-          // Navigate to provider registration with form data
           this.router.navigate(['/proveedores/registro'], {
             state: {
               email: formData.email,
@@ -387,7 +638,6 @@ export class AuthPage {
             }
           });
         } else {
-          // Register as client
           await this.servicioAutenticacion.registrar(formData.email, formData.password, {
             name: formData.name,
             phone: formData.phone,
@@ -397,7 +647,6 @@ export class AuthPage {
           this.router.navigate(['/onboarding'], { replaceUrl: true });
         }
       } else {
-        // Login
         const resultado = await this.servicioAutenticacion.iniciarSesion(formData.email, formData.password);
 
         if (resultado.datosUsuario?.userType === 'provider') {

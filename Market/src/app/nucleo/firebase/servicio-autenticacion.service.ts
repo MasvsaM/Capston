@@ -1,170 +1,141 @@
-import { Injectable, inject } from '@angular/core';
-import {
-  Auth,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  user as usuarioFirebase
-} from '@angular/fire/auth';
-import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
-import { Observable, from, map, switchMap } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Usuario } from '@compartido/modelos';
+
+interface SimulatedAuthUser {
+  uid: string;
+  email: string;
+  displayName: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServicioAutenticacion {
-  private readonly auth = inject(Auth);
-  private readonly firestore = inject(Firestore);
+  private readonly authStateSubject = new BehaviorSubject<SimulatedAuthUser | null>(null);
+  private readonly userSubject = new BehaviorSubject<Usuario | null>(null);
 
-  private readonly usuarioFirebase$ = usuarioFirebase(this.auth);
+  readonly estadoAutenticacion$ = this.authStateSubject.asObservable();
+  readonly usuarioActual$ = this.userSubject.asObservable();
 
-  readonly estadoAutenticacion$ = this.usuarioFirebase$;
-
-  readonly usuarioActual$ = this.usuarioFirebase$.pipe(
-    switchMap(usuario => {
-      if (!usuario) {
-        return from([null]);
-      }
-      return this.obtenerDatosUsuario(usuario.uid);
-    })
-  );
-
-  async iniciarSesion(correo: string, contrasena: string): Promise<any> {
-    try {
-      const credencial = await signInWithEmailAndPassword(this.auth, correo, contrasena);
-      const datosUsuario = await this.obtenerDatosUsuario(credencial.user.uid).toPromise();
-      return { usuario: credencial.user, datosUsuario };
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      throw error;
-    }
+  async iniciarSesion(correo: string, _contrasena: string): Promise<any> {
+    const authUser = this.createSimulatedAuthUser(correo);
+    const datosUsuario = this.setAuthenticatedUser(authUser);
+    return { usuario: authUser, datosUsuario };
   }
 
-  async registrar(correo: string, contrasena: string, datos: Partial<Usuario>): Promise<any> {
-    try {
-      const credencial = await createUserWithEmailAndPassword(this.auth, correo, contrasena);
-
-      const nuevoUsuario: Usuario = {
-        uid: credencial.user.uid,
-        name: datos.name || '',
-        email: correo,
-        phone: datos.phone || '',
-        location: datos.location || 'Santiago, Chile',
-        planType: 'Básico',
-        userType: datos.userType || 'client',
-        businessName: datos.businessName,
-        services: datos.services,
-        rating: datos.rating || 0,
-        totalReviews: datos.totalReviews || 0,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      await this.crearDocumentoUsuario(nuevoUsuario);
-      return { usuario: credencial.user, datosUsuario: nuevoUsuario };
-    } catch (error) {
-      console.error('Error al registrar:', error);
-      throw error;
-    }
+  async registrar(correo: string, _contrasena: string, datos: Partial<Usuario>): Promise<any> {
+    const authUser = this.createSimulatedAuthUser(correo, datos.name);
+    const datosUsuario = this.setAuthenticatedUser(authUser, datos);
+    return { usuario: authUser, datosUsuario };
   }
 
   async iniciarSesionConGoogle(): Promise<any> {
-    try {
-      const proveedor = new GoogleAuthProvider();
-      const credencial = await signInWithPopup(this.auth, proveedor);
-
-      const datosUsuario = await this.obtenerDatosUsuario(credencial.user.uid).toPromise();
-
-      if (!datosUsuario) {
-        const nuevoUsuario: Usuario = {
-          uid: credencial.user.uid,
-          name: credencial.user.displayName || 'Usuario',
-          email: credencial.user.email || '',
-          phone: '',
-          location: 'Santiago, Chile',
-          planType: 'Básico',
-          userType: 'client',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-        await this.crearDocumentoUsuario(nuevoUsuario);
-        return { usuario: credencial.user, datosUsuario: nuevoUsuario, esUsuarioNuevo: true };
-      }
-
-      return { usuario: credencial.user, datosUsuario, esUsuarioNuevo: false };
-    } catch (error) {
-      console.error('Error al iniciar sesión con Google:', error);
-      throw error;
-    }
+    const authUser = this.createSimulatedAuthUser('demo-google@marketpet.app', 'Usuario Google');
+    const datosUsuario = this.setAuthenticatedUser(authUser);
+    return { usuario: authUser, datosUsuario, esUsuarioNuevo: false };
   }
 
   async iniciarSesionConFacebook(): Promise<any> {
-    try {
-      const proveedor = new FacebookAuthProvider();
-      const credencial = await signInWithPopup(this.auth, proveedor);
-
-      const datosUsuario = await this.obtenerDatosUsuario(credencial.user.uid).toPromise();
-
-      if (!datosUsuario) {
-        const nuevoUsuario: Usuario = {
-          uid: credencial.user.uid,
-          name: credencial.user.displayName || 'Usuario',
-          email: credencial.user.email || '',
-          phone: '',
-          location: 'Santiago, Chile',
-          planType: 'Básico',
-          userType: 'client',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-        await this.crearDocumentoUsuario(nuevoUsuario);
-        return { usuario: credencial.user, datosUsuario: nuevoUsuario, esUsuarioNuevo: true };
-      }
-
-      return { usuario: credencial.user, datosUsuario, esUsuarioNuevo: false };
-    } catch (error) {
-      console.error('Error al iniciar sesión con Facebook:', error);
-      throw error;
-    }
+    const authUser = this.createSimulatedAuthUser('demo-facebook@marketpet.app', 'Usuario Facebook');
+    const datosUsuario = this.setAuthenticatedUser(authUser);
+    return { usuario: authUser, datosUsuario, esUsuarioNuevo: false };
   }
 
   async cerrarSesion(): Promise<void> {
-    try {
-      await signOut(this.auth);
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-      throw error;
-    }
+    this.authStateSubject.next(null);
+    this.userSubject.next(null);
   }
 
   async actualizarPerfilUsuario(uid: string, cambios: Partial<Usuario>): Promise<void> {
-    const referencia = doc(this.firestore, `users/${uid}`);
-    await setDoc(referencia, { ...cambios, updatedAt: new Date() }, { merge: true });
+    const actual = this.userSubject.value;
+    if (!actual || actual.uid !== uid) {
+      return;
+    }
+
+    const actualizado: Usuario = {
+      ...actual,
+      ...cambios,
+      name: cambios.name ?? actual.name,
+      phone: cambios.phone ?? actual.phone,
+      location: cambios.location ?? actual.location,
+      planType: cambios.planType ?? actual.planType,
+      userType: cambios.userType ?? actual.userType,
+      businessName: cambios.businessName ?? actual.businessName,
+      services: cambios.services ?? actual.services,
+      rating: cambios.rating ?? actual.rating,
+      totalReviews: cambios.totalReviews ?? actual.totalReviews,
+      updatedAt: new Date()
+    };
+
+    this.userSubject.next(actualizado);
   }
 
-  private async crearDocumentoUsuario(usuario: Usuario): Promise<void> {
-    const referencia = doc(this.firestore, `users/${usuario.uid}`);
-    await setDoc(referencia, usuario);
+  private setAuthenticatedUser(authUser: SimulatedAuthUser, overrides: Partial<Usuario> = {}): Usuario {
+    const base =
+      this.userSubject.value && this.userSubject.value.uid === authUser.uid
+        ? this.userSubject.value
+        : this.createDefaultUserData(authUser, overrides);
+
+    const actualizado: Usuario = {
+      ...base,
+      ...overrides,
+      name: overrides.name ?? base.name,
+      phone: overrides.phone ?? base.phone,
+      email: authUser.email,
+      location: overrides.location ?? base.location,
+      planType: overrides.planType ?? base.planType,
+      userType: overrides.userType ?? base.userType,
+      businessName: overrides.businessName ?? base.businessName,
+      services: overrides.services ?? base.services,
+      rating: overrides.rating ?? base.rating,
+      totalReviews: overrides.totalReviews ?? base.totalReviews,
+      updatedAt: new Date(),
+      createdAt: base.createdAt ?? new Date()
+    };
+
+    this.authStateSubject.next(authUser);
+    this.userSubject.next(actualizado);
+
+    return actualizado;
   }
 
-  private obtenerDatosUsuario(uid: string): Observable<Usuario | null> {
-    const referencia = doc(this.firestore, `users/${uid}`);
-    return from(getDoc(referencia)).pipe(
-      map(documento => {
-        if (documento.exists()) {
-          const datos = documento.data() as Usuario;
-          return {
-            ...datos,
-            createdAt: datos.createdAt instanceof Date ? datos.createdAt : new Date(datos.createdAt),
-            updatedAt: datos.updatedAt instanceof Date ? datos.updatedAt : new Date(datos.updatedAt)
-          };
-        }
-        return null;
-      })
-    );
+  private createDefaultUserData(authUser: SimulatedAuthUser, overrides: Partial<Usuario>): Usuario {
+    const now = new Date();
+    const userType = overrides.userType ?? this.resolveUserType(authUser.email);
+
+    return {
+      uid: authUser.uid,
+      name: overrides.name ?? authUser.displayName ?? 'Usuario Demo',
+      email: authUser.email,
+      phone: overrides.phone ?? '+56 9 0000 0000',
+      location: overrides.location ?? 'Santiago, Chile',
+      planType: overrides.planType ?? 'Premium',
+      userType,
+      businessName: overrides.businessName,
+      services: overrides.services,
+      rating: overrides.rating ?? (userType === 'provider' ? 4.9 : undefined),
+      totalReviews: overrides.totalReviews ?? (userType === 'provider' ? 128 : undefined),
+      createdAt: overrides.createdAt ?? now,
+      updatedAt: overrides.updatedAt ?? now
+    };
+  }
+
+  private createSimulatedAuthUser(email: string, name?: string): SimulatedAuthUser {
+    return {
+      uid: this.generateUid(email),
+      email,
+      displayName: name || 'Usuario Demo'
+    };
+  }
+
+  private resolveUserType(email: string): 'client' | 'provider' {
+    const normalized = email.toLowerCase();
+    return normalized.includes('proveedor') || normalized.includes('provider') ? 'provider' : 'client';
+  }
+
+  private generateUid(email: string): string {
+    const normalized = email ? email.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() : 'usuario';
+    return `sim-${normalized || 'usuario'}`;
   }
 }
