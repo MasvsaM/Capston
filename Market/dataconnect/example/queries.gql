@@ -1,0 +1,15 @@
+query ListPetOwners {
+  petOwners {
+    id
+    fullName
+    email
+  }
+}
+
+mutation CreatePetOwner($owner: PetOwnerInput!) {
+  addPetOwner(owner: $owner) {
+    id
+    fullName
+    email
+  }
+}

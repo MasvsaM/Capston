@@ -1,0 +1,10 @@
+connectorId: example
+serviceConfig:
+  serviceId: market
+  location: southamerica-west1
+client:
+  platform: web
+  language: javascript
+sdk:
+  output: ../../src/dataconnect-generated
+  package: "@dataconnect/example"

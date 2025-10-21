@@ -1,0 +1,32 @@
+schema @database(provider: "postgres") {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  healthCheck: HealthCheck!
+    @resolver(name: "health_check")
+  petOwners: [PetOwner!]!
+    @resolver(name: "list_pet_owners")
+}
+
+type Mutation {
+  addPetOwner(owner: PetOwnerInput!): PetOwner!
+    @resolver(name: "add_pet_owner")
+}
+
+type HealthCheck {
+  ok: Boolean!
+}
+
+type PetOwner {
+  id: ID!
+  fullName: String!
+  email: String!
+  createdAt: Timestamp!
+}
+
+input PetOwnerInput {
+  fullName: String!
+  email: String!
+}

@@ -1,0 +1,17 @@
+serviceConfig:
+  serviceId: market
+  location: southamerica-west1
+  database:
+    postgres:
+      cloudSql:
+        instanceId: market-fdc
+        databaseId: postgres
+        user: dataconnect_user
+schema:
+  source: schema/schema.gql
+operations:
+  - name: example
+    source: example/queries.gql
+    type: queries
+seedData:
+  file: seed_data.gql

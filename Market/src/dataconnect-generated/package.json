@@ -1,0 +1,7 @@
+{
+  "name": "@dataconnect/example",
+  "version": "0.0.1",
+  "main": "./index.cjs.js",
+  "module": "./esm/index.esm.js",
+  "types": "./index.d.ts"
+}
