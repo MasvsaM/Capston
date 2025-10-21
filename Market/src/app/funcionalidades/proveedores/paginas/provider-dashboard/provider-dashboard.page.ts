@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent,
   IonHeader,
@@ -25,10 +25,10 @@ import {
   pencilOutline
 } from 'ionicons/icons';
 import { ServicioAutenticacion } from '@nucleo/firebase';
-import { ServicioAccesoDatosProveedores } from '@funcionalidades/proveedores/servicios';
 import { ServicioAccesoDatosCitas } from '@funcionalidades/citas/servicios';
 import { Cita, Proveedor } from '@compartido/modelos';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-provider-dashboard',
@@ -330,34 +330,28 @@ import { Observable, Subscription } from 'rxjs';
     }
   `]
 })
-export class ProviderDashboardPage implements OnInit, OnDestroy {
+export class ProviderDashboardPage {
   private servicioAutenticacion = inject(ServicioAutenticacion);
-  private servicioAccesoDatosProveedores = inject(ServicioAccesoDatosProveedores);
   private servicioAccesoDatosCitas = inject(ServicioAccesoDatosCitas);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  provider$!: Observable<Proveedor | null>;
-  upcomingAppointments$!: Observable<Cita[]>;
+  provider$: Observable<Proveedor | null> = this.route.data.pipe(
+    map(data => data['perfilProveedor'] as Proveedor | null)
+  );
+
+  upcomingAppointments$: Observable<Cita[]> = this.servicioAutenticacion.usuarioActual$.pipe(
+    switchMap(usuario => {
+      if (!usuario) {
+        return of([] as Cita[]);
+      }
+      return this.servicioAccesoDatosCitas.obtenerCitasDeProveedor(usuario.uid);
+    })
+  );
   defaultImage = 'https://images.unsplash.com/photo-1558944351-dae1be1f4436?w=100&h=100&fit=crop';
-
-  private subscription = new Subscription();
 
   constructor() {
     addIcons({ calendarOutline, locationOutline, callOutline, chatbubbleOutline, pencilOutline });
-  }
-
-  ngOnInit(): void {
-    const sub = this.servicioAutenticacion.usuarioActual$.subscribe(user => {
-      if (user) {
-        this.provider$ = this.servicioAccesoDatosProveedores.obtenerProveedor(user.uid);
-        this.upcomingAppointments$ = this.servicioAccesoDatosCitas.obtenerCitasDeProveedor(user.uid);
-      }
-    });
-    this.subscription.add(sub);
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 
   refreshData(event: CustomEvent) {

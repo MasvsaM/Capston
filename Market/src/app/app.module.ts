@@ -12,6 +12,7 @@ import { provideStorage, getStorage } from '@angular/fire/storage';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
+import { GuardianAutenticacion, GuardianRol } from '@nucleo/guardianes';
 
 @NgModule({
   imports: [
@@ -26,6 +27,8 @@ import { environment } from '../environments/environment';
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     provideStorage(() => getStorage()),
+    GuardianAutenticacion,
+    GuardianRol,
   ],
   bootstrap: [AppComponent],
 })
