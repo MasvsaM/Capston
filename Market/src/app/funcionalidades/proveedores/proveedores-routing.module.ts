@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from '@nucleo/guardias/auth.guard';
+import { GuardianAutenticacion, GuardianRol } from '@nucleo/guardianes';
+import { ResolverPerfilProveedor } from './acceso-datos';
 
 const routes: Routes = [
   {
@@ -15,13 +16,19 @@ const routes: Routes = [
   },
   {
     path: 'onboarding',
-    canActivate: [AuthGuard],
+    canActivate: [GuardianAutenticacion],
     loadComponent: () =>
       import('./paginas/provider-onboarding/provider-onboarding.page').then(m => m.ProviderOnboardingPage),
   },
   {
     path: 'panel',
-    canActivate: [AuthGuard],
+    canActivate: [GuardianAutenticacion, GuardianRol],
+    data: {
+      roles: ['provider'],
+    },
+    resolve: {
+      perfilProveedor: ResolverPerfilProveedor,
+    },
     loadComponent: () =>
       import('./paginas/provider-dashboard/provider-dashboard.page').then(m => m.ProviderDashboardPage),
   },

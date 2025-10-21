@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from '@nucleo/guardias/auth.guard';
+import { GuardianAutenticacion } from '@nucleo/guardianes';
 
 const routes: Routes = [
   {
@@ -10,7 +10,7 @@ const routes: Routes = [
   },
   {
     path: 'formulario',
-    canActivate: [AuthGuard],
+    canActivate: [GuardianAutenticacion],
     loadComponent: () =>
       import('./paginas/pet-form/pet-form.page').then(m => m.PetFormPage),
   },

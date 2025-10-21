@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from '@nucleo/guardias/auth.guard';
+import { GuardianAutenticacion } from '@nucleo/guardianes';
 
 const routes: Routes = [
   {
     path: '',
-    canActivate: [AuthGuard],
+    canActivate: [GuardianAutenticacion],
     loadComponent: () =>
       import('./paginas/subscription/subscription.page').then(m => m.SubscriptionPage),
   },
