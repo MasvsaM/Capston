@@ -1,0 +1,24 @@
+mutation CreateUser($displayName: String!, $email: String, $photoUrl: String) @auth(level: USER) {
+  user_insert(data: {displayName: $displayName, email: $email, photoUrl: $photoUrl})
+}
+
+query GetPet($id: UUID!) @auth(level: USER) {
+  pet(id: $id) {
+    name
+    species
+    breed
+    dateOfBirth
+  }
+}
+
+mutation UpdateVaccinationNotes($id: UUID!, $notes: String) @auth(level: USER) {
+  vaccination_update(id: $id, data: {notes: $notes})
+}
+
+query ListPetsBySpecies($species: String!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  pets(where: {species: {eq: $species}}) {
+    id
+    name
+    breed
+  }
+}

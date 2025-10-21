@@ -1,0 +1,53 @@
+type User @table {
+  displayName: String!
+  createdAt: Timestamp!
+  email: String
+  photoUrl: String
+}
+
+type Pet @table {
+  owner: User!
+  name: String!
+  species: String!
+  breed: String!
+  dateOfBirth: Date!
+  createdAt: Timestamp!
+  photoUrl: String
+  notes: String
+  allergies: [String]
+  dietaryRestrictions: [String]
+}
+
+type Vaccination @table {
+  pet: Pet!
+  vaccineName: String!
+  vaccinationDate: Date!
+  nextDueDate: Date!
+  createdAt: Timestamp!
+  vetName: String
+  notes: String
+}
+
+type Medication @table {
+  pet: Pet!
+  medicationName: String!
+  dosage: String!
+  frequency: String!
+  startDate: Date!
+  createdAt: Timestamp!
+  endDate: Date
+  instructions: String
+  vetName: String
+  notes: String
+}
+
+type Appointment @table {
+  pet: Pet!
+  appointmentDate: Timestamp!
+  appointmentType: String!
+  createdAt: Timestamp!
+  vetName: String
+  location: String
+  notes: String
+  reminderDate: Timestamp
+}

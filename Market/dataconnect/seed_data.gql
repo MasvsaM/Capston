@@ -1,0 +1,94 @@
+mutation CreateSeedData @transaction @auth(level: PUBLIC, insecureReason: "This mutation is used to populate the database with initial data and is safe to expose to the public.") {
+  user_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      displayName: "demouser1",
+      createdAt: "2024-04-26T12:00:00Z",
+      email: "demo1@example.com",
+      photoUrl: "https://example.com/photo1.jpg"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440001",
+      displayName: "demouser2",
+      createdAt: "2024-04-26T13:00:00Z",
+      email: "demo2@example.com",
+      photoUrl: "https://example.com/photo2.jpg"
+    }
+  ])
+  pet_insertMany(data: [
+    {
+      id: "650e8400-e29b-41d4-a716-446655440000",
+      ownerId: "550e8400-e29b-41d4-a716-446655440000",
+      name: "Buddy",
+      species: "Dog",
+      breed: "Golden Retriever",
+      dateOfBirth: "2020-01-01",
+      createdAt: "2024-04-26T14:00:00Z"
+    },
+    {
+      id: "650e8400-e29b-41d4-a716-446655440001",
+      ownerId: "550e8400-e29b-41d4-a716-446655440001",
+      name: "Whiskers",
+      species: "Cat",
+      breed: "Siamese",
+      dateOfBirth: "2021-03-15",
+      createdAt: "2024-04-26T15:00:00Z"
+    }
+  ])
+  vaccination_insertMany(data: [
+    {
+      id: "750e8400-e29b-41d4-a716-446655440000",
+      petId: "650e8400-e29b-41d4-a716-446655440000",
+      vaccineName: "Rabies",
+      vaccinationDate: "2024-01-01",
+      nextDueDate: "2025-01-01",
+      createdAt: "2024-04-26T16:00:00Z"
+    },
+    {
+      id: "750e8400-e29b-41d4-a716-446655440001",
+      petId: "650e8400-e29b-41d4-a716-446655440001",
+      vaccineName: "FVRCP",
+      vaccinationDate: "2024-02-15",
+      nextDueDate: "2025-02-15",
+      createdAt: "2024-04-26T17:00:00Z"
+    }
+  ])
+  medication_insertMany(data: [
+    {
+      id: "850e8400-e29b-41d4-a716-446655440000",
+      petId: "650e8400-e29b-41d4-a716-446655440000",
+      medicationName: "Heartgard",
+      dosage: "1 chewable",
+      frequency: "Monthly",
+      startDate: "2024-01-01",
+      endDate: "2024-12-31",
+      createdAt: "2024-04-26T18:00:00Z"
+    },
+    {
+      id: "850e8400-e29b-41d4-a716-446655440001",
+      petId: "650e8400-e29b-41d4-a716-446655440001",
+      medicationName: "Revolution",
+      dosage: "1 application",
+      frequency: "Monthly",
+      startDate: "2024-02-15",
+      endDate: "2024-12-31",
+      createdAt: "2024-04-26T19:00:00Z"
+    }
+  ])
+  appointment_insertMany(data: [
+    {
+      id: "950e8400-e29b-41d4-a716-446655440000",
+      petId: "650e8400-e29b-41d4-a716-446655440000",
+      appointmentType: "Checkup",
+      appointmentDate: "2024-05-01T10:00:00Z",
+      createdAt: "2024-04-26T20:00:00Z"
+    },
+    {
+      id: "950e8400-e29b-41d4-a716-446655440001",
+      petId: "650e8400-e29b-41d4-a716-446655440001",
+      appointmentType: "Vaccination",
+      appointmentDate: "2024-06-15T14:00:00Z",
+      createdAt: "2024-04-26T21:00:00Z"
+    }
+  ])
+}

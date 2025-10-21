@@ -1,0 +1,46 @@
+extend type Appointment {
+  """
+  ✨ Implicit primary key field. It's a UUID column default to a generated new value. See `@table` for how to customize it.
+  """
+  id: UUID! @default(expr: "uuidV4()") @fdc_generated(from: "Appointment", purpose: IMPLICIT_KEY_FIELD)
+  """
+  ✨ Implicit foreign key field based on `Appointment`.`pet`. It must match the value of `Pet`.`id`. See `@ref` for how to customize it.
+  """
+  petId: UUID! @fdc_generated(from: "Appointment.pet", purpose: IMPLICIT_REF_FIELD)
+}
+extend type Medication {
+  """
+  ✨ Implicit primary key field. It's a UUID column default to a generated new value. See `@table` for how to customize it.
+  """
+  id: UUID! @default(expr: "uuidV4()") @fdc_generated(from: "Medication", purpose: IMPLICIT_KEY_FIELD)
+  """
+  ✨ Implicit foreign key field based on `Medication`.`pet`. It must match the value of `Pet`.`id`. See `@ref` for how to customize it.
+  """
+  petId: UUID! @fdc_generated(from: "Medication.pet", purpose: IMPLICIT_REF_FIELD)
+}
+extend type Pet {
+  """
+  ✨ Implicit primary key field. It's a UUID column default to a generated new value. See `@table` for how to customize it.
+  """
+  id: UUID! @default(expr: "uuidV4()") @fdc_generated(from: "Pet", purpose: IMPLICIT_KEY_FIELD)
+  """
+  ✨ Implicit foreign key field based on `Pet`.`owner`. It must match the value of `User`.`id`. See `@ref` for how to customize it.
+  """
+  ownerId: UUID! @fdc_generated(from: "Pet.owner", purpose: IMPLICIT_REF_FIELD)
+}
+extend type User {
+  """
+  ✨ Implicit primary key field. It's a UUID column default to a generated new value. See `@table` for how to customize it.
+  """
+  id: UUID! @default(expr: "uuidV4()") @fdc_generated(from: "User", purpose: IMPLICIT_KEY_FIELD)
+}
+extend type Vaccination {
+  """
+  ✨ Implicit primary key field. It's a UUID column default to a generated new value. See `@table` for how to customize it.
+  """
+  id: UUID! @default(expr: "uuidV4()") @fdc_generated(from: "Vaccination", purpose: IMPLICIT_KEY_FIELD)
+  """
+  ✨ Implicit foreign key field based on `Vaccination`.`pet`. It must match the value of `Pet`.`id`. See `@ref` for how to customize it.
+  """
+  petId: UUID! @fdc_generated(from: "Vaccination.pet", purpose: IMPLICIT_REF_FIELD)
+}

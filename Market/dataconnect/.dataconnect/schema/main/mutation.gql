@@ -1,0 +1,562 @@
+extend type Mutation {
+  """
+  ✨ Insert a single `Appointment` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  appointment_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Appointment_Data!
+  ): Appointment_KeyOutput! @fdc_generated(from: "Appointment", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Medication` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  medication_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Medication_Data!
+  ): Medication_KeyOutput! @fdc_generated(from: "Medication", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Pet` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  pet_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Pet_Data!
+  ): Pet_KeyOutput! @fdc_generated(from: "Pet", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `User` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Vaccination` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  vaccination_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Vaccination_Data!
+  ): Vaccination_KeyOutput! @fdc_generated(from: "Vaccination", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert `Appointment` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  appointment_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Appointment_Data!]!
+  ): [Appointment_KeyOutput!]! @fdc_generated(from: "Appointment", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Medication` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  medication_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Medication_Data!]!
+  ): [Medication_KeyOutput!]! @fdc_generated(from: "Medication", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Pet` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  pet_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Pet_Data!]!
+  ): [Pet_KeyOutput!]! @fdc_generated(from: "Pet", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `User` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Vaccination` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  vaccination_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Vaccination_Data!]!
+  ): [Vaccination_KeyOutput!]! @fdc_generated(from: "Vaccination", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert or update a single `Appointment` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Appointment`.
+  """
+  appointment_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Appointment_Data!
+  ): Appointment_KeyOutput! @fdc_generated(from: "Appointment", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Medication` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Medication`.
+  """
+  medication_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Medication_Data!
+  ): Medication_KeyOutput! @fdc_generated(from: "Medication", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Pet` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Pet`.
+  """
+  pet_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Pet_Data!
+  ): Pet_KeyOutput! @fdc_generated(from: "Pet", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `User` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Vaccination` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Vaccination`.
+  """
+  vaccination_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Vaccination_Data!
+  ): Vaccination_KeyOutput! @fdc_generated(from: "Vaccination", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update `Appointment` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Appointment`.
+  """
+  appointment_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Appointment_Data!]!
+  ): [Appointment_KeyOutput!]! @fdc_generated(from: "Appointment", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Medication` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Medication`.
+  """
+  medication_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Medication_Data!]!
+  ): [Medication_KeyOutput!]! @fdc_generated(from: "Medication", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Pet` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Pet`.
+  """
+  pet_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Pet_Data!]!
+  ): [Pet_KeyOutput!]! @fdc_generated(from: "Pet", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `User` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Vaccination` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Vaccination`.
+  """
+  vaccination_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Vaccination_Data!]!
+  ): [Vaccination_KeyOutput!]! @fdc_generated(from: "Vaccination", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Update a single `Appointment` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Appointment` or `null` if not found.
+  """
+  appointment_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Appointment_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Appointment_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Appointment_Data!
+  ): Appointment_KeyOutput @fdc_generated(from: "Appointment", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Medication` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Medication` or `null` if not found.
+  """
+  medication_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Medication_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Medication_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Medication_Data!
+  ): Medication_KeyOutput @fdc_generated(from: "Medication", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Pet` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Pet` or `null` if not found.
+  """
+  pet_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Pet_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Pet_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Pet_Data!
+  ): Pet_KeyOutput @fdc_generated(from: "Pet", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `User` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `User` or `null` if not found.
+  """
+  user_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: User_Data!
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Vaccination` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Vaccination` or `null` if not found.
+  """
+  vaccination_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Vaccination_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Vaccination_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Vaccination_Data!
+  ): Vaccination_KeyOutput @fdc_generated(from: "Vaccination", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update `Appointment` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  appointment_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Appointment_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Appointment_Data!
+  ): Int! @fdc_generated(from: "Appointment", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Medication` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  medication_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Medication_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Medication_Data!
+  ): Int! @fdc_generated(from: "Medication", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Pet` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  pet_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Pet_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Pet_Data!
+  ): Int! @fdc_generated(from: "Pet", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `User` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  user_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: User_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: User_Data!
+  ): Int! @fdc_generated(from: "User", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Vaccination` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  vaccination_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Vaccination_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Vaccination_Data!
+  ): Int! @fdc_generated(from: "Vaccination", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Delete a single `Appointment` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  appointment_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Appointment_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Appointment_FirstRow
+  ): Appointment_KeyOutput @fdc_generated(from: "Appointment", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Medication` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  medication_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Medication_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Medication_FirstRow
+  ): Medication_KeyOutput @fdc_generated(from: "Medication", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Pet` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  pet_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Pet_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Pet_FirstRow
+  ): Pet_KeyOutput @fdc_generated(from: "Pet", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `User` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  user_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Vaccination` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  vaccination_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Vaccination_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Vaccination_FirstRow
+  ): Vaccination_KeyOutput @fdc_generated(from: "Vaccination", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete `Appointment` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  appointment_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Appointment_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Appointment", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Medication` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  medication_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Medication_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Medication", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Pet` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  pet_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Pet_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Pet", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `User` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  user_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: User_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "User", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Vaccination` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  vaccination_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Vaccination_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Vaccination", purpose: DELETE_MULTIPLE)
+}
