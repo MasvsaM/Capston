@@ -1,7 +1,7 @@
 import { CreateUserData, CreateUserVariables, GetPetData, GetPetVariables, UpdateVaccinationNotesData, UpdateVaccinationNotesVariables, ListPetsBySpeciesData, ListPetsBySpeciesVariables } from '../';
 import { ConnectorConfig, DataConnect, QueryRef, QueryPromise, MutationRef, MutationPromise} from '@angular/fire/data-connect';
 import { CreateQueryResult, CreateMutationResult} from '@tanstack/angular-query-experimental';
-import { CreateDataConnectQueryResult, CreateDataConnectQueryOptions, CreateDataConnectMutationResult, DataConnectMutationOptionsUndefinedMutationFn } from '@tanstack-query-firebase/angular/data-connect';
+import { CreateDataConnectQueryResult, CreateDataConnectQueryOptions, CreateDataConnectMutationResult, DataConnectMutationOptionsUndefinedMutationFn } from './tanstack-data-connect';
 import { FirebaseError } from 'firebase/app';
 import { Injector } from '@angular/core';
 

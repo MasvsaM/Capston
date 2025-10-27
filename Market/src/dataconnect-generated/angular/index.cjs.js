@@ -1,6 +1,6 @@
 const { createUserRef, getPetRef, updateVaccinationNotesRef, listPetsBySpeciesRef } = require('../');
 const { DataConnect, CallerSdkTypeEnum } = require('@angular/fire/data-connect');
-const { injectDataConnectQuery, injectDataConnectMutation } = require('@tanstack-query-firebase/angular/data-connect');
+const { injectDataConnectQuery, injectDataConnectMutation } = require('./tanstack-data-connect.cjs');
 const { inject, EnvironmentInjector } = require('@angular/core');
 
 exports.injectCreateUser = function injectCreateUser(args, injector) {
