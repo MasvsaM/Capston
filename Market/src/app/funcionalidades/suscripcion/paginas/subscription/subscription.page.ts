@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardContent,
-  IonButton, IonIcon, IonList, IonItem, IonLabel, IonChip
+  IonButton, IonIcon, IonList, IonItem, IonLabel, IonChip, IonBadge
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -12,7 +13,8 @@ import {
   rocketOutline,
   shieldCheckmarkOutline,
   starOutline,
-  bulbOutline
+  bulbOutline,
+  flameOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -71,7 +73,7 @@ import {
                 </ion-item>
               </ion-list>
 
-              <ion-button expand="block" class="subscribe-btn">Quiero ser Premium</ion-button>
+              <ion-button expand="block" class="subscribe-btn" (click)="irATienda()">Quiero ser Premium</ion-button>
             </ion-card-content>
           </ion-card>
         </section>
@@ -87,6 +89,78 @@ import {
                 </div>
                 <h4>{{ highlight.title }}</h4>
                 <p>{{ highlight.description }}</p>
+              </ion-card-content>
+            </ion-card>
+          </div>
+        </section>
+
+        <section class="premium-preview-section">
+          <div class="preview-header">
+            <div>
+              <h3>Vista previa de la cuenta Premium</h3>
+              <p class="preview-description">
+                Así se verá tu comunidad cuando actives la suscripción: foros moderados, métricas claras y beneficios desbloqueados automáticamente tras el pago en Webpay.
+              </p>
+            </div>
+            <ion-button color="light" fill="outline" (click)="irATienda()">
+              Ir a la tienda y activar
+            </ion-button>
+          </div>
+
+          <div class="preview-grid">
+            <ion-card *ngFor="let foro of forosDestacados" class="forum-card">
+              <ion-card-content>
+                <div class="forum-header">
+                  <div class="forum-icon">
+                    <ion-icon [name]="foro.icono"></ion-icon>
+                  </div>
+                  <ion-badge color="tertiary">{{ foro.miembros }} miembros</ion-badge>
+                </div>
+                <h4>{{ foro.titulo }}</h4>
+                <p>{{ foro.descripcion }}</p>
+
+                <div class="forum-stats">
+                  <ion-chip color="light">
+                    <ion-icon name="chatbubbles-outline"></ion-icon>
+                    <ion-label>{{ foro.nuevosHilos }} hilos nuevos</ion-label>
+                  </ion-chip>
+                  <ion-chip color="light">
+                    <ion-icon name="flame-outline"></ion-icon>
+                    <ion-label>Tendencia</ion-label>
+                  </ion-chip>
+                </div>
+
+                <div class="forum-topics">
+                  <span *ngFor="let tema of foro.temasDestacados">#{{ tema }}</span>
+                </div>
+              </ion-card-content>
+            </ion-card>
+
+            <ion-card class="premium-dashboard-card">
+              <ion-card-content>
+                <h4>Panel Premium listo</h4>
+                <p>
+                  Visualiza métricas clave y beneficios que se habilitan automáticamente después del pago. Todo queda conectado con tu suscripción.
+                </p>
+
+                <ion-list lines="none">
+                  <ion-item *ngFor="let metrica of metricasPremium">
+                    <ion-badge [color]="metrica.color">{{ metrica.valor }}</ion-badge>
+                    <ion-label>
+                      <h5>{{ metrica.titulo }}</h5>
+                      <p>{{ metrica.descripcion }}</p>
+                    </ion-label>
+                  </ion-item>
+                </ion-list>
+
+                <div class="dashboard-footer">
+                  <ion-button size="small" fill="outline" color="light" (click)="irATienda()">
+                    Activar en Webpay
+                  </ion-button>
+                  <ion-button size="small" color="light">
+                    Ver foros en vivo
+                  </ion-button>
+                </div>
               </ion-card-content>
             </ion-card>
           </div>
@@ -319,6 +393,115 @@ import {
       font-size: 0.95rem;
     }
 
+    .premium-preview-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      color: #fff;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .preview-description {
+      margin: 0.35rem 0 0;
+      opacity: 0.8;
+    }
+
+    .preview-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .forum-card,
+    .premium-dashboard-card {
+      border-radius: 24px;
+      background: rgba(17, 22, 42, 0.72);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 40px rgba(10, 22, 45, 0.35);
+    }
+
+    .forum-card ion-card-content,
+    .premium-dashboard-card ion-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .forum-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .forum-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: rgba(83, 208, 255, 0.18);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #53d0ff;
+      font-size: 1.4rem;
+    }
+
+    .forum-card h4,
+    .premium-dashboard-card h4 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .forum-card p,
+    .premium-dashboard-card p {
+      margin: 0;
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+
+    .forum-stats {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .forum-stats ion-chip {
+      --background: rgba(255, 255, 255, 0.16);
+      --color: #fff;
+    }
+
+    .forum-topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      opacity: 0.85;
+      font-size: 0.9rem;
+    }
+
+    .forum-topics span {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+    }
+
+    .premium-dashboard-card ion-item {
+      --background: rgba(15, 24, 47, 0.4);
+      border-radius: 18px;
+      margin-bottom: 0.75rem;
+    }
+
+    .dashboard-footer {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
     .cta-section {
       display: flex;
       justify-content: center;
@@ -375,7 +558,7 @@ import {
   imports: [
     CommonModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardContent,
-    IonButton, IonIcon, IonList, IonItem, IonLabel, IonChip
+    IonButton, IonIcon, IonList, IonItem, IonLabel, IonChip, IonBadge
   ]
 })
 export class SubscriptionPage {
@@ -421,6 +604,48 @@ export class SubscriptionPage {
     }
   ];
 
+  forosDestacados = [
+    {
+      icono: 'chatbubbles-outline',
+      titulo: 'Círculo de bienestar y nutrición',
+      descripcion: 'Recetas, planes alimenticios y recomendaciones de especialistas certificados.',
+      miembros: '2.3K',
+      nuevosHilos: 14,
+      temasDestacados: ['RecetasNaturales', 'SuplementosSeguros', 'PlanBarf'],
+    },
+    {
+      icono: 'shield-checkmark-outline',
+      titulo: 'Soporte veterinario Premium',
+      descripcion: 'Casos clínicos, seguimiento de tratamientos y respuestas priorizadas.',
+      miembros: '1.1K',
+      nuevosHilos: 9,
+      temasDestacados: ['CuidadoSenior', 'Rehabilitacion', 'Telemedicina'],
+    },
+  ];
+
+  metricasPremium = [
+    {
+      titulo: 'Participación semanal',
+      valor: '92%',
+      descripcion: 'Miembros activos dentro de los últimos 7 días.',
+      color: 'success',
+    },
+    {
+      titulo: 'Nuevos foros creados',
+      valor: '+18',
+      descripcion: 'Espacios premium lanzados este mes.',
+      color: 'tertiary',
+    },
+    {
+      titulo: 'Beneficios utilizados',
+      valor: '74%',
+      descripcion: 'Promociones y cupones aplicados tras el pago.',
+      color: 'warning',
+    },
+  ];
+
+  private readonly router = inject(Router);
+
   constructor() {
     addIcons({
       checkmarkOutline,
@@ -429,7 +654,12 @@ export class SubscriptionPage {
       rocketOutline,
       shieldCheckmarkOutline,
       starOutline,
-      bulbOutline
+      bulbOutline,
+      flameOutline
     });
+  }
+
+  irATienda(): void {
+    void this.router.navigate(['/tienda']);
   }
 }
