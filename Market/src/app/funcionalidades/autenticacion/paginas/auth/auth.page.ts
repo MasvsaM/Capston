@@ -647,7 +647,9 @@ export class AuthPage {
           this.router.navigate(['/onboarding'], { replaceUrl: true });
         }
       } else {
-        const resultado = await this.servicioAutenticacion.iniciarSesion(formData.email, formData.password);
+        const resultado = await this.servicioAutenticacion.iniciarSesion(formData.email, formData.password, {
+          userType: this.userType
+        });
 
         if (resultado.datosUsuario?.userType === 'provider') {
           this.router.navigate(['/proveedores/panel'], { replaceUrl: true });
@@ -665,7 +667,9 @@ export class AuthPage {
   async loginWithGoogle() {
     try {
       this.isLoading = true;
-      const resultado = await this.servicioAutenticacion.iniciarSesionConGoogle();
+      const resultado = await this.servicioAutenticacion.iniciarSesionConGoogle({
+        userType: this.userType
+      });
 
       if (resultado.esUsuarioNuevo) {
         this.router.navigate(['/onboarding'], { replaceUrl: true });
@@ -686,7 +690,9 @@ export class AuthPage {
   async loginWithFacebook() {
     try {
       this.isLoading = true;
-      const resultado = await this.servicioAutenticacion.iniciarSesionConFacebook();
+      const resultado = await this.servicioAutenticacion.iniciarSesionConFacebook({
+        userType: this.userType
+      });
 
       if (resultado.esUsuarioNuevo) {
         this.router.navigate(['/onboarding'], { replaceUrl: true });
