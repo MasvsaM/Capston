@@ -1,7 +1,18 @@
 import { Component } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { pawOutline, paw, businessOutline, business, calendarOutline, calendar, ribbonOutline, ribbon } from 'ionicons/icons';
+import {
+  pawOutline,
+  paw,
+  businessOutline,
+  business,
+  calendarOutline,
+  calendar,
+  ribbonOutline,
+  ribbon,
+  bagHandleOutline,
+  bagHandle,
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -26,6 +37,11 @@ import { pawOutline, paw, businessOutline, business, calendarOutline, calendar, 
         <ion-tab-button tab="suscripcion">
           <ion-icon name="ribbon"></ion-icon>
           <ion-label>Planes</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="tienda">
+          <ion-icon name="bag-handle"></ion-icon>
+          <ion-label>Tienda</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
@@ -65,6 +81,17 @@ import { pawOutline, paw, businessOutline, business, calendarOutline, calendar, 
 })
 export class TabsPage {
   constructor() {
-    addIcons({ pawOutline, paw, businessOutline, business, calendarOutline, calendar, ribbonOutline, ribbon });
+    addIcons({
+      pawOutline,
+      paw,
+      businessOutline,
+      business,
+      calendarOutline,
+      calendar,
+      ribbonOutline,
+      ribbon,
+      bagHandleOutline,
+      bagHandle,
+    });
   }
 }
