@@ -30,6 +30,11 @@ const routes: Routes = [
           import('@funcionalidades/suscripcion/suscripcion.module').then(m => m.SuscripcionModule),
       },
       {
+        path: 'tienda',
+        loadChildren: () =>
+          import('@funcionalidades/tienda/tienda.module').then(m => m.TiendaModule),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'mascotas',
