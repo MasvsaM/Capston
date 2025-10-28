@@ -18,9 +18,14 @@ export class ServicioAutenticacion {
   readonly estadoAutenticacion$ = this.authStateSubject.asObservable();
   readonly usuarioActual$ = this.userSubject.asObservable();
 
-  async iniciarSesion(correo: string, _contrasena: string): Promise<any> {
+  async iniciarSesion(
+    correo: string,
+    _contrasena: string,
+    opciones?: { userType?: 'client' | 'provider' }
+  ): Promise<any> {
     const authUser = this.createSimulatedAuthUser(correo);
-    const datosUsuario = this.setAuthenticatedUser(authUser);
+    const overrides: Partial<Usuario> = opciones?.userType ? { userType: opciones.userType } : {};
+    const datosUsuario = this.setAuthenticatedUser(authUser, overrides);
     return { usuario: authUser, datosUsuario };
   }
 
@@ -30,15 +35,17 @@ export class ServicioAutenticacion {
     return { usuario: authUser, datosUsuario };
   }
 
-  async iniciarSesionConGoogle(): Promise<any> {
+  async iniciarSesionConGoogle(opciones?: { userType?: 'client' | 'provider' }): Promise<any> {
     const authUser = this.createSimulatedAuthUser('demo-google@marketpet.app', 'Usuario Google');
-    const datosUsuario = this.setAuthenticatedUser(authUser);
+    const overrides: Partial<Usuario> = opciones?.userType ? { userType: opciones.userType } : {};
+    const datosUsuario = this.setAuthenticatedUser(authUser, overrides);
     return { usuario: authUser, datosUsuario, esUsuarioNuevo: false };
   }
 
-  async iniciarSesionConFacebook(): Promise<any> {
+  async iniciarSesionConFacebook(opciones?: { userType?: 'client' | 'provider' }): Promise<any> {
     const authUser = this.createSimulatedAuthUser('demo-facebook@marketpet.app', 'Usuario Facebook');
-    const datosUsuario = this.setAuthenticatedUser(authUser);
+    const overrides: Partial<Usuario> = opciones?.userType ? { userType: opciones.userType } : {};
+    const datosUsuario = this.setAuthenticatedUser(authUser, overrides);
     return { usuario: authUser, datosUsuario, esUsuarioNuevo: false };
   }
 
