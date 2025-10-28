@@ -1,6 +1,6 @@
 import { createUserRef, getPetRef, updateVaccinationNotesRef, listPetsBySpeciesRef } from '../../';
 import { DataConnect, CallerSdkTypeEnum } from '@angular/fire/data-connect';
-import { injectDataConnectQuery, injectDataConnectMutation } from '@tanstack-query-firebase/angular/data-connect';
+import { injectDataConnectQuery, injectDataConnectMutation } from './tanstack-data-connect.mjs';
 import { inject, EnvironmentInjector } from '@angular/core';
 export function injectCreateUser(args, injector) {
   return injectDataConnectMutation(createUserRef, args, injector, CallerSdkTypeEnum.GeneratedAngular);
