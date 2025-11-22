@@ -112,6 +112,10 @@ extend type Appointment {
   ✨ Maximum of the `reminderDate` field in the `Appointment` table.
   """
   reminderDate_max: Timestamp @fdc_generated(from: "Appointment.reminderDate", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "Appointment.id", purpose: GLOBAL_ID)
 }
 extend type Medication {
   """
@@ -245,6 +249,10 @@ extend type Medication {
   ✨ Maximum of the `startDate` field in the `Medication` table.
   """
   startDate_max: Date @fdc_generated(from: "Medication.startDate", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "Medication.id", purpose: GLOBAL_ID)
 }
 extend type Pet {
   """
@@ -454,6 +462,10 @@ extend type Pet {
   ✨ Maximum of the `dateOfBirth` field in the `Pet` table.
   """
   dateOfBirth_max: Date @fdc_generated(from: "Pet.dateOfBirth", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "Pet.id", purpose: GLOBAL_ID)
 }
 extend type User {
   """
@@ -551,6 +563,10 @@ extend type User {
   ✨ Maximum of the `createdAt` field in the `User` table.
   """
   createdAt_max: Timestamp @fdc_generated(from: "User.createdAt", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "User.id", purpose: GLOBAL_ID)
 }
 extend type Vaccination {
   """
@@ -657,4 +673,8 @@ extend type Vaccination {
   ✨ Maximum of the `vaccinationDate` field in the `Vaccination` table.
   """
   vaccinationDate_max: Date @fdc_generated(from: "Vaccination.vaccinationDate", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "Vaccination.id", purpose: GLOBAL_ID)
 }
