@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'client_services_screen.dart';
 
 class ClientHome extends StatefulWidget {
   const ClientHome({super.key});
@@ -20,9 +21,13 @@ class _ClientHomeState extends State<ClientHome> {
         .snapshots();
   }
 
-  Future<void> _openPetDialog({DocumentSnapshot<Map<String, dynamic>>? pet}) async {
+  Future<void> _openPetDialog({
+    DocumentSnapshot<Map<String, dynamic>>? pet,
+  }) async {
     final nameCtrl = TextEditingController(text: pet?.data()?['name'] ?? '');
-    final speciesCtrl = TextEditingController(text: pet?.data()?['species'] ?? '');
+    final speciesCtrl = TextEditingController(
+      text: pet?.data()?['species'] ?? '',
+    );
     final breedCtrl = TextEditingController(text: pet?.data()?['breed'] ?? '');
     final ageCtrl = TextEditingController(
       text: pet?.data()?['age']?.toString() ?? '',
@@ -46,7 +51,9 @@ class _ClientHomeState extends State<ClientHome> {
                 ),
                 TextField(
                   controller: speciesCtrl,
-                  decoration: const InputDecoration(labelText: 'Especie (perro, gato, etc.)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Especie (perro, gato, etc.)',
+                  ),
                 ),
                 TextField(
                   controller: breedCtrl,
@@ -87,8 +94,7 @@ class _ClientHomeState extends State<ClientHome> {
                   'updatedAt': FieldValue.serverTimestamp(),
                 };
 
-                final petsRef =
-                    FirebaseFirestore.instance.collection('pets');
+                final petsRef = FirebaseFirestore.instance.collection('pets');
 
                 if (isEdit) {
                   await petsRef.doc(pet!.id).update(data);
@@ -120,11 +126,24 @@ class _ClientHomeState extends State<ClientHome> {
         title: const Text('MarketPet - Mis mascotas'),
         actions: [
           IconButton(
+            tooltip: 'Ver servicios',
+            icon: const Icon(Icons.shopping_bag_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ClientServicesScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => FirebaseAuth.instance.signOut(),
           ),
         ],
       ),
+
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _petsStream(),
         builder: (context, snapshot) {
@@ -147,18 +166,20 @@ class _ClientHomeState extends State<ClientHome> {
               final pet = docs[index];
               final data = pet.data();
 
+              final name = (data['name'] ?? '').toString();
+              final species = (data['species'] ?? '').toString();
+              final breed = (data['breed'] ?? '').toString();
+              final age = data['age'];
+
+              final subtitleParts = <String>[];
+              if (species.isNotEmpty) subtitleParts.add('Especie: $species');
+              if (breed.isNotEmpty) subtitleParts.add('Raza: $breed');
+              if (age != null) subtitleParts.add('Edad: $age años');
+
               return Card(
                 child: ListTile(
-                  title: Text(data['name'] ?? ''),
-                  subtitle: Text(
-                    [
-                      if (data['species'] != null && data['species'] != '')
-                        'Especie: ${data['species']}',
-                      if (data['breed'] != null && data['breed'] != '')
-                        'Raza: ${data['breed']}',
-                      if (data['age'] != null) 'Edad: ${data['age']} años',
-                    ].where((e) => e.isNotEmpty).join(' • '),
-                  ),
+                  title: Text(name),
+                  subtitle: Text(subtitleParts.join(' • ')),
                   onTap: () => _openPetDialog(pet: pet),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.redAccent),
@@ -177,4 +198,3 @@ class _ClientHomeState extends State<ClientHome> {
     );
   }
 }
-
