@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "17187771784",
+    "project_id": "marketpet-app",
+    "storage_bucket": "marketpet-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:17187771784:android:95d9b69b0e80084bc6d63d",
+        "android_client_info": {
+          "package_name": "com.example.app_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD51rA1rrXDM8h0sH3ciO1DEu-cK0xDQC4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
