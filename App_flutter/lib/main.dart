@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -11,17 +12,24 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const AppMarketPet());
+  runApp(const AplicacionMarketPet());
 }
 
-class AppMarketPet extends StatelessWidget {
-  const AppMarketPet({super.key});
+class AplicacionMarketPet extends StatelessWidget {
+  const AplicacionMarketPet({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MarketPet',
       debugShowCheckedModeBanner: false,
+      locale: const Locale('es'),
+      supportedLocales: const [Locale('es'), Locale('en')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
