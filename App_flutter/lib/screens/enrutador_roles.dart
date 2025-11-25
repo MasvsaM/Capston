@@ -2,24 +2,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'client_home.dart';
-import 'provider_home.dart';
-import 'admin_home.dart';
+import 'inicio_clientes.dart';
+import 'inicio_proveedores.dart';
+import 'inicio_admin.dart';
 
-class RoleRouter extends StatelessWidget {
-  const RoleRouter({super.key});
+class EnrutadorRoles extends StatelessWidget {
+  const EnrutadorRoles({super.key});
 
-  Future<String?> _getRole() async {
+  Future<String?> _obtenerRol() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final doc =
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    return doc.data()?['role'] as String?;
+    return doc.data()?['rol'] as String?;
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
-      future: _getRole(),
+      future: _obtenerRol(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
@@ -27,11 +27,11 @@ class RoleRouter extends StatelessWidget {
           );
         }
 
-        final role = snapshot.data;
-        if (role == 'cliente') return const ClientHome();
-        if (role == 'proveedor') return const ProviderHome();
-        // Si en Firestore le pones role = 'admin' a alguien, vendrá acá:
-        return const AdminHome();
+        final rol = snapshot.data;
+        if (rol == 'cliente') return const InicioClientes();
+        if (rol == 'proveedor') return const InicioProveedores();
+        // Si en Firestore le pones rol = 'admin' a alguien, vendrá acá:
+        return const InicioAdmin();
       },
     );
   }

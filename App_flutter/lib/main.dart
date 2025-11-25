@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'firebase_options.dart'; // generado por flutterfire configure
-import 'screens/login_screen.dart';
+import 'firebase_options.dart';
+import 'screens/pantalla_autenticacion.dart';
+import 'screens/enrutador_roles.dart';
 import 'screens/home_screen.dart';
 
 Future<void> main() async {
@@ -14,33 +16,43 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(const AplicacionMarketPet());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class AplicacionMarketPet extends StatelessWidget {
+  const AplicacionMarketPet({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'App Producción',
       debugShowCheckedModeBanner: false,
+      locale: const Locale('es'),
+      supportedLocales: const [
+        Locale('es'),
+        Locale('en'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.teal,
       ),
-      // AuthGate decide si mostrar login o home según el estado actual
-      home: const AuthGate(),
+      home: const PortalAutenticacion(),
+      // Opcional: rutas con nombre por si las usas en otros lados
       routes: {
         '/home': (_) => const HomeScreen(),
-        '/login': (_) => const LoginScreen(),
+        '/login': (_) => const PantallaAutenticacion(),
       },
     );
   }
 }
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+class PortalAutenticacion extends StatelessWidget {
+  const PortalAutenticacion({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,11 +68,11 @@ class AuthGate extends StatelessWidget {
 
         // Si no hay usuario -> login
         if (!snapshot.hasData) {
-          return const LoginScreen();
+          return const PantallaAutenticacion();
         }
 
-        // Si hay usuario -> home
-        return const HomeScreen();
+        // Si hay usuario → según rol
+        return const EnrutadorRoles();
       },
     );
   }
