@@ -1,71 +1,40 @@
 # App_flutter
 
-Aplicación Flutter conectada a Firebase para el ecosistema **MarketPet** (Android, iOS y Web). Todas las pantallas, colecciones y variables están en español. Usa esta guía paso a paso para dejar Firebase listo para producción sin depender de FlutterFire CLI.
+Aplicación Flutter conectada a Firebase para el ecosistema **MarketPet** (Android, iOS y Web). Todas las pantallas, colecciones y variables están en español. Usa esta guía paso a paso para dejar Firebase listo para producción y ejecutar la app en tus dispositivos.
 
 ## Requisitos locales
 - Flutter 3.19+ y Dart 3+ instalados (incluye `flutter_localizations`).
 - Cuenta de Firebase con permisos de propietario.
-- Archivos de configuración descargados desde la consola de Firebase:
+- Archivos de configuración generados por `flutterfire configure`:
   - `android/app/google-services.json`
   - `ios/Runner/GoogleService-Info.plist` y `macos/Runner/GoogleService-Info.plist`
-  - `lib/firebase_options.dart` completo con tus valores de Firebase (puedes copiar este molde y pegar tus claves):
-    ```dart
-    import 'package:firebase_core/firebase_core.dart';
+  - `lib/firebase_options.dart` (ya existe, regenera si cambias IDs o agregas plataformas nuevas).
 
-    const FirebaseOptions firebaseWebPro = FirebaseOptions(
-      apiKey: 'TU_API_KEY',
-      appId: 'TU_APP_ID',
-      messagingSenderId: 'TU_MESSAGING_SENDER_ID',
-      projectId: 'TU_PROJECT_ID',
-      authDomain: 'TU_DOMINIO.firebaseapp.com',
-      storageBucket: 'TU_BUCKET.appspot.com',
-      measurementId: 'G-XXXXXXX',
-    );
-
-    const FirebaseOptions firebaseAndroidPro = FirebaseOptions(
-      apiKey: 'TU_API_KEY',
-      appId: 'TU_APP_ID',
-      messagingSenderId: 'TU_MESSAGING_SENDER_ID',
-      projectId: 'TU_PROJECT_ID',
-      storageBucket: 'TU_BUCKET.appspot.com',
-    );
-
-    const FirebaseOptions firebaseIosPro = FirebaseOptions(
-      apiKey: 'TU_API_KEY',
-      appId: 'TU_APP_ID',
-      messagingSenderId: 'TU_MESSAGING_SENDER_ID',
-      projectId: 'TU_PROJECT_ID',
-      storageBucket: 'TU_BUCKET.appspot.com',
-      iosBundleId: 'com.tuempresa.marketpet',
-    );
-    ```
-
-## Guía rápida multiplataforma (Firebase y Flutter por separado)
-1. **Autentícate en Firebase CLI y selecciona proyecto**
+## Guía rápida multiplataforma
+1. **Configurar Firebase y credenciales**
+   - Android: agrega SHA-1 y SHA-256 de *release* en Firebase > Configuración del proyecto > Tus apps.
+   - iOS/macOS: habilita *Push Notifications* y *Background Modes* en Xcode si usarás FCM.
+   - Web: añade los dominios productivos en Authentication > Dominios autorizados.
+2. **Generar archivos de Firebase**
    ```bash
-   npm install -g firebase-tools           # si aún no lo tienes
-   firebase login                         # usa tu cuenta de owner
-   firebase use <id_proyecto>             # selecciona el proyecto productivo
+   cd App_flutter
+   flutterfire configure --project <id_proyecto> \
+     --android-package-name <com.tuempresa.marketpet> \
+     --ios-bundle-id <com.tuempresa.marketpet> \
+     --web-app-id <id_web_si_aplica>
    ```
-2. **Registra apps en la consola de Firebase**
-   - Android: registra el `package name` definitivo y descarga `google-services.json`.
-   - iOS/macOS: registra los `bundle id` definitivos y descarga `GoogleService-Info.plist` para cada plataforma.
-   - Web: crea la app web, copia las claves para completar `firebase_options.dart` o usa `Firebase.initializeApp` con `FirebaseOptions`.
-3. **Coloca los archivos en el proyecto**
-   - Copia los JSON/PLIST en las rutas indicadas y añade `firebase_options.dart` con los valores correctos.
-   - Revisa que `android/app/build.gradle` tenga aplicado el plugin `com.google.gms.google-services` y `ios/Runner` tenga los frameworks de Firebase.
-4. **Firmar builds de producción**
+3. **Firmar builds de producción**
    - Android: genera `key.jks`, crea `android/key.properties` y referencia en `android/app/build.gradle`.
    - iOS/macOS: usa certificados y perfiles de aprovisionamiento *Release* en Xcode.
-5. **Correr y probar por plataforma**
+4. **Ejecutar en dispositivos**
    ```bash
-   flutter run -d <dispositivo_android>   # o -d ios, -d macos, -d chrome
+   flutter pub get
+   flutter run -d <device>   # usa chrome para web
    ```
-6. **Construir artefactos de release por separado**
+5. **Construir para producción**
    ```bash
    flutter build apk --release
    flutter build ios --release
-   flutter build macos --release
    flutter build web --release
    ```
 
@@ -127,23 +96,13 @@ Aplicación Flutter conectada a Firebase para el ecosistema **MarketPet** (Andro
 - `config/precios`: `premiumMensual`, `cuotaProveedor`, `actualizadoEn`.
 
 ## Comandos en la terminal
-Ejecuta los de Firebase desde cualquier ruta y los de Flutter dentro de `App_flutter`.
-
-**Firebase CLI**
-- `firebase login` (una sola vez por dispositivo)
-- `firebase use <id_proyecto>` (elige el proyecto productivo)
-- `firebase deploy --only firestore:rules,storage` (sube reglas seguras)
-- `firebase deploy --only hosting` (si publicas el panel web de envíos)
-
-**Flutter**
-- `flutter pub get`
-- `dart format lib`
-- `flutter run -d <dispositivo>` (usa `chrome` para web)
-- `flutter build apk --release`
-- `flutter build ios --release`
-- `flutter build macos --release`
-- `flutter build web --release`
-- `flutter test`
+Ejecuta todos desde la carpeta `App_flutter`:
+- Instalar dependencias: `flutter pub get`
+- Formatear código: `dart format lib`
+- Configurar Firebase: `flutterfire configure`
+- Lanzar app en Android/iOS/Web: `flutter run -d <dispositivo>` (usa `chrome` para web)
+- Generar builds de producción: `flutter build apk --release`, `flutter build ios --release`, `flutter build web --release`
+- Probar (si tienes Flutter SDK en el entorno): `flutter test`
 
 ## Estructura de pantallas (todas en español)
 - **pantalla_autenticacion.dart**: login/registro con selección de rol y formulario inicial de proveedor.
@@ -154,7 +113,7 @@ Ejecuta los de Firebase desde cualquier ruta y los de Flutter dentro de `App_flu
 - **pagina_premium.dart**: activación/cancelación de plan premium y beneficios.
 - **pagina_tienda_webpay.dart**: flujo simulado de pago WebPay y seguimiento web.
 - **inicio_proveedores.dart**: panel para proveedores (servicio principal, microservicios, márgenes y suscripción).
-- **inicio_admin.dart**: panel admin para precios de suscripción, cambio de roles y métricas de negocio.
+- **inicio_admin.dart**: panel admin para precios, roles, métricas y conexión de dashboards.
 
 ## Flujo por rol
 - **Cliente**: se autentica, gestiona mascotas, puede explorar servicios, crear/entrar a foros, activar Premium y comprar por WebPay.
