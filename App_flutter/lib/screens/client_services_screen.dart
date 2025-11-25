@@ -53,7 +53,7 @@ class ClientServicesScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     DropdownButtonFormField<String>(
-                      value: selectedPetId,
+                      initialValue: selectedPetId,
                       decoration: const InputDecoration(
                         labelText: 'Mascota',
                         border: OutlineInputBorder(),

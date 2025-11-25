@@ -4,7 +4,7 @@ plugins {
     id("com.google.gms.google-services")
     // END: FlutterFire Configuration
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    // El plugin de Flutter debe ir después de los de Android y Kotlin.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -14,19 +14,22 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // Usamos Java 17, compatible con las versiones nuevas de Android
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    // Sí, Gradle marca esto como "deprecated", pero sigue funcionando.
+    // Más adelante se puede migrar a compilerOptions DSL si quieres.
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // Application ID (paquete de la app)
         applicationId = "com.example.app_flutter"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+
+        // Valores que controla Flutter (desde android/Flutter.gradle)
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -35,13 +38,21 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // Por ahora firmamos con la key de debug para poder probar `--release`.
+            // Cuando tengas tu key.jks, aquí ponemos la config de release real.
             signingConfig = signingConfigs.getByName("debug")
+
+            // IMPORTANTE: No hacemos shrink de código ni de recursos aún
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
+        debug {
+            // Config extra de debug (por ahora vacío)
         }
     }
 }
 
+// Este bloque lo usa Flutter internamente para encontrar el código Dart.
 flutter {
     source = "../.."
 }
