@@ -24,6 +24,7 @@ class _PaginaForosState extends State<PaginaForos> {
 
   Future<void> _crearForo() async {
     if (controladorTituloForo.text.trim().isEmpty) return;
+
     await FirebaseFirestore.instance.collection('foros').add({
       'titulo': controladorTituloForo.text.trim(),
       'descripcion': controladorDescripcionForo.text.trim(),
@@ -31,6 +32,7 @@ class _PaginaForosState extends State<PaginaForos> {
       'miembros': [idUsuario],
       'creadoEn': FieldValue.serverTimestamp(),
     });
+
     controladorTituloForo.clear();
     controladorDescripcionForo.clear();
   }
@@ -39,6 +41,13 @@ class _PaginaForosState extends State<PaginaForos> {
     await FirebaseFirestore.instance.collection('foros').doc(idForo).update({
       'miembros': FieldValue.arrayUnion([idUsuario]),
     });
+  }
+
+  @override
+  void dispose() {
+    controladorTituloForo.dispose();
+    controladorDescripcionForo.dispose();
+    super.dispose();
   }
 
   @override
@@ -56,7 +65,8 @@ class _PaginaForosState extends State<PaginaForos> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Crea foros temáticos para razas, ciudades o problemas específicos. Los clientes premium pueden crear y moderar foros privados.',
+                'Crea foros temáticos para razas, ciudades o problemas específicos. '
+                'Los clientes premium pueden crear y moderar foros privados.',
               ),
               const SizedBox(height: 12),
               TextField(
@@ -88,11 +98,26 @@ class _PaginaForosState extends State<PaginaForos> {
           ),
         ),
         Expanded(
-          child: StreamBuilder<QuerySnapshot<Map<String, dynamic}}>(
+          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
             stream: _foros(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
+              }
+
+              if (snapshot.hasError) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'Ocurrió un problema al cargar los foros.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ),
+                );
               }
 
               final foros = snapshot.data?.docs ?? [];
@@ -100,7 +125,9 @@ class _PaginaForosState extends State<PaginaForos> {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(16),
-                    child: Text('Sé el primero en crear un foro para tu comunidad 🐾'),
+                    child: Text(
+                      'Sé el primero en crear un foro para tu comunidad 🐾',
+                    ),
                   ),
                 );
               }
@@ -109,14 +136,20 @@ class _PaginaForosState extends State<PaginaForos> {
                 itemCount: foros.length,
                 itemBuilder: (context, index) {
                   final foro = foros[index];
-                  final miembros = List<String>.from(foro['miembros'] ?? []);
+                  final miembros =
+                      List<String>.from(foro['miembros'] ?? []);
                   final yaSoyMiembro = miembros.contains(idUsuario);
 
                   return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: ListTile(
                       title: Text(foro['titulo'] ?? ''),
-                      subtitle: Text('${foro['descripcion'] ?? ''}\nMiembros: ${miembros.length}'),
+                      subtitle: Text(
+                        '${foro['descripcion'] ?? ''}\nMiembros: ${miembros.length}',
+                      ),
                       isThreeLine: true,
                       trailing: yaSoyMiembro
                           ? const Chip(label: Text('Miembro'))

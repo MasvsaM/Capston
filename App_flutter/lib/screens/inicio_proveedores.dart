@@ -41,14 +41,21 @@ class _InicioProveedoresState extends State<InicioProveedores> {
   }
 
   Future<void> _guardarPerfilBasico() async {
-    await FirebaseFirestore.instance.collection('proveedores').doc(idProveedor).set({
-      'servicioPrincipal': controladorServicioPrincipal.text.trim(),
-      'detalleServicios': controladorDetalleServicios.text.trim(),
-      'zonaCobertura': controladorZona.text.trim(),
-      'costosOperativos': num.tryParse(controladorCostos.text.trim()) ?? 0,
-      'suscripcionActiva': suscripcionActiva,
-      'actualizadoEn': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+    await FirebaseFirestore.instance
+        .collection('proveedores')
+        .doc(idProveedor)
+        .set(
+      {
+        'servicioPrincipal': controladorServicioPrincipal.text.trim(),
+        'detalleServicios': controladorDetalleServicios.text.trim(),
+        'zonaCobertura': controladorZona.text.trim(),
+        'costosOperativos':
+            num.tryParse(controladorCostos.text.trim()) ?? 0,
+        'suscripcionActiva': suscripcionActiva,
+        'actualizadoEn': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,14 +64,18 @@ class _InicioProveedoresState extends State<InicioProveedores> {
     }
   }
 
-  Future<void> _abrirDialogoMicroservicio(
-      {DocumentSnapshot<Map<String, dynamic>>? microservicio}) async {
-    final controladorTitulo =
-        TextEditingController(text: microservicio?.data()?['nombre'] ?? '');
+  Future<void> _abrirDialogoMicroservicio({
+    DocumentSnapshot<Map<String, dynamic>>? microservicio,
+  }) async {
+    final controladorTitulo = TextEditingController(
+      text: microservicio?.data()?['nombre'] ?? '',
+    );
     final controladorPrecio = TextEditingController(
-        text: microservicio?.data()?['precio']?.toString() ?? '');
+      text: microservicio?.data()?['precio']?.toString() ?? '',
+    );
     final controladorDescripcion = TextEditingController(
-        text: microservicio?.data()?['descripcion'] ?? '');
+      text: microservicio?.data()?['descripcion'] ?? '',
+    );
 
     final esEdicion = microservicio != null;
 
@@ -113,6 +124,7 @@ class _InicioProveedoresState extends State<InicioProveedores> {
             ElevatedButton(
               onPressed: () async {
                 if (controladorTitulo.text.trim().isEmpty) return;
+
                 final referencia = FirebaseFirestore.instance
                     .collection('proveedores')
                     .doc(idProveedor)
@@ -120,13 +132,16 @@ class _InicioProveedoresState extends State<InicioProveedores> {
 
                 final datos = {
                   'nombre': controladorTitulo.text.trim(),
-                  'precio': num.tryParse(controladorPrecio.text.trim()) ?? 0,
+                  'precio':
+                      num.tryParse(controladorPrecio.text.trim()) ?? 0,
                   'descripcion': controladorDescripcion.text.trim(),
                   'creadoEn': FieldValue.serverTimestamp(),
                 };
 
                 if (esEdicion) {
-                  await referencia.doc(microservicio!.id).set(datos, SetOptions(merge: true));
+                  await referencia
+                      .doc(microservicio!.id)
+                      .set(datos, SetOptions(merge: true));
                 } else {
                   await referencia.add(datos);
                 }
@@ -151,6 +166,15 @@ class _InicioProveedoresState extends State<InicioProveedores> {
   }
 
   @override
+  void dispose() {
+    controladorServicioPrincipal.dispose();
+    controladorDetalleServicios.dispose();
+    controladorZona.dispose();
+    controladorCostos.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -168,7 +192,7 @@ class _InicioProveedoresState extends State<InicioProveedores> {
         label: const Text('Microservicio'),
         onPressed: () => _abrirDialogoMicroservicio(),
       ),
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic}}>(
+      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         future: _cargarPerfil(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -176,20 +200,25 @@ class _InicioProveedoresState extends State<InicioProveedores> {
           }
 
           final datos = snapshot.data?.data() ?? {};
+
           controladorServicioPrincipal.text =
               controladorServicioPrincipal.text.isNotEmpty
                   ? controladorServicioPrincipal.text
                   : (datos['servicioPrincipal'] ?? '');
+
           controladorDetalleServicios.text =
               controladorDetalleServicios.text.isNotEmpty
                   ? controladorDetalleServicios.text
                   : (datos['detalleServicios'] ?? '');
+
           controladorZona.text = controladorZona.text.isNotEmpty
               ? controladorZona.text
               : (datos['zonaCobertura'] ?? '');
+
           controladorCostos.text = controladorCostos.text.isNotEmpty
               ? controladorCostos.text
               : (datos['costosOperativos']?.toString() ?? '');
+
           suscripcionActiva = datos['suscripcionActiva'] ?? true;
 
           final ingresos = datos['ingresosAcumulados'] ?? 0;
@@ -247,9 +276,11 @@ class _InicioProveedoresState extends State<InicioProveedores> {
                 const SizedBox(height: 8),
                 SwitchListTile.adaptive(
                   title: const Text('Suscripción activa'),
-                  subtitle: const Text('Controla la visibilidad de tus servicios'),
+                  subtitle: const Text(
+                      'Controla la visibilidad de tus servicios'),
                   value: suscripcionActiva,
-                  onChanged: (valor) => setState(() => suscripcionActiva = valor),
+                  onChanged: (valor) =>
+                      setState(() => suscripcionActiva = valor),
                 ),
                 SizedBox(
                   width: double.infinity,
@@ -282,33 +313,37 @@ class _InicioProveedoresState extends State<InicioProveedores> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
                     Text(
                       'Microservicios personalizados',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                StreamBuilder<QuerySnapshot<Map<String, dynamic}}>(
+                StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                   stream: _microservicios(),
                   builder: (context, microSnapshot) {
                     if (microSnapshot.connectionState ==
                         ConnectionState.waiting) {
                       return const Center(
-                          child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: CircularProgressIndicator(),
-                      ));
+                        child: Padding(
+                          padding: EdgeInsets.all(12),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
                     }
 
                     final docs = microSnapshot.data?.docs ?? [];
                     if (docs.isEmpty) {
                       return const Text(
-                          'Aún no tienes microservicios. Crea uno con el botón flotante.');
+                        'Aún no tienes microservicios. Crea uno con el botón flotante.',
+                      );
                     }
 
                     return Column(
@@ -317,7 +352,9 @@ class _InicioProveedoresState extends State<InicioProveedores> {
                             (doc) => Card(
                               child: ListTile(
                                 title: Text(doc['nombre'] ?? ''),
-                                subtitle: Text('${doc['descripcion'] ?? ''}\nCLP ${doc['precio'] ?? 0}'),
+                                subtitle: Text(
+                                  '${doc['descripcion'] ?? ''}\nCLP ${doc['precio'] ?? 0}',
+                                ),
                                 isThreeLine: true,
                                 trailing: Wrap(
                                   spacing: 6,
@@ -325,11 +362,16 @@ class _InicioProveedoresState extends State<InicioProveedores> {
                                     IconButton(
                                       icon: const Icon(Icons.edit),
                                       onPressed: () =>
-                                          _abrirDialogoMicroservicio(microservicio: doc),
+                                          _abrirDialogoMicroservicio(
+                                              microservicio: doc),
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.redAccent),
-                                      onPressed: () => _eliminarMicroservicio(doc.id),
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.redAccent,
+                                      ),
+                                      onPressed: () =>
+                                          _eliminarMicroservicio(doc.id),
                                     ),
                                   ],
                                 ),
@@ -374,7 +416,10 @@ class _TarjetaIndicador extends StatelessWidget {
         children: [
           CircleAvatar(
             backgroundColor: theme.colorScheme.primaryContainer,
-            child: Icon(icono, color: theme.colorScheme.onPrimaryContainer),
+            child: Icon(
+              icono,
+              color: theme.colorScheme.onPrimaryContainer,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -390,7 +435,7 @@ class _TarjetaIndicador extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
