@@ -97,7 +97,7 @@ class _ClientHomeState extends State<ClientHome> {
                 final petsRef = FirebaseFirestore.instance.collection('pets');
 
                 if (isEdit) {
-                  await petsRef.doc(pet!.id).update(data);
+                  await petsRef.doc(pet.id).update(data);
                 } else {
                   await petsRef.add({
                     ...data,

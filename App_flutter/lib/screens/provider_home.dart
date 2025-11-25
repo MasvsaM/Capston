@@ -101,7 +101,7 @@ class _ProviderHomeState extends State<ProviderHome> {
                 );
 
                 if (isEdit) {
-                  await servicesRef.doc(service!.id).update(data);
+                  await servicesRef.doc(service.id).update(data);
                 } else {
                   await servicesRef.add({
                     ...data,
