@@ -36,6 +36,8 @@ dependencies:
   firebase_auth: ^6.1.2
   cloud_firestore: ^6.1.0
   provider: ^6.0.0
+  google_sign_in: any
+  flutter_facebook_auth: any
 
 
 dev_dependencies:
