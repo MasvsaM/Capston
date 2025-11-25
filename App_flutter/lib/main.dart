@@ -3,19 +3,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'firebase_options.dart';
-import 'screens/login_screen.dart';
-import 'screens/role_router.dart';
+import 'screens/pantalla_autenticacion.dart';
+import 'screens/enrutador_roles.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MarketPetApp());
+  runApp(const AppMarketPet());
 }
 
-class MarketPetApp extends StatelessWidget {
-  const MarketPetApp({super.key});
+class AppMarketPet extends StatelessWidget {
+  const AppMarketPet({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +26,13 @@ class MarketPetApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const AuthGate(),
+      home: const PortalAutenticacion(),
     );
   }
 }
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+class PortalAutenticacion extends StatelessWidget {
+  const PortalAutenticacion({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +48,11 @@ class AuthGate extends StatelessWidget {
 
         // Si NO hay usuario → Login
         if (!snapshot.hasData) {
-          return const LoginScreen();
+          return const PantallaAutenticacion();
         }
 
         // Si hay usuario → según rol
-        return const RoleRouter();
+        return const EnrutadorRoles();
       },
     );
   }
