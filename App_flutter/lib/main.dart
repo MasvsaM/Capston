@@ -1,38 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'firebase_options.dart';
-import 'screens/login_screen.dart';
-import 'screens/role_router.dart';
+import 'screens/pantalla_autenticacion.dart';
+import 'screens/enrutador_roles.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MarketPetApp());
+  runApp(const AplicacionMarketPet());
 }
 
-class MarketPetApp extends StatelessWidget {
-  const MarketPetApp({super.key});
+class AplicacionMarketPet extends StatelessWidget {
+  const AplicacionMarketPet({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MarketPet',
       debugShowCheckedModeBanner: false,
+      locale: const Locale('es'),
+      supportedLocales: const [Locale('es'), Locale('en')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const AuthGate(),
+      home: const PortalAutenticacion(),
     );
   }
 }
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+class PortalAutenticacion extends StatelessWidget {
+  const PortalAutenticacion({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +56,11 @@ class AuthGate extends StatelessWidget {
 
         // Si NO hay usuario → Login
         if (!snapshot.hasData) {
-          return const LoginScreen();
+          return const PantallaAutenticacion();
         }
 
         // Si hay usuario → según rol
-        return const RoleRouter();
+        return const EnrutadorRoles();
       },
     );
   }
