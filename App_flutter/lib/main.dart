@@ -6,12 +6,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'screens/pantalla_autenticacion.dart';
 import 'screens/enrutador_roles.dart';
+import 'screens/home_screen.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializa Firebase con las opciones de tu proyecto
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const AplicacionMarketPet());
 }
 
@@ -21,20 +25,28 @@ class AplicacionMarketPet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MarketPet',
+      title: 'App Producción',
       debugShowCheckedModeBanner: false,
       locale: const Locale('es'),
-      supportedLocales: const [Locale('es'), Locale('en')],
+      supportedLocales: const [
+        Locale('es'),
+        Locale('en'),
+      ],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
+        colorSchemeSeed: Colors.teal,
       ),
       home: const PortalAutenticacion(),
+      // Opcional: rutas con nombre por si las usas en otros lados
+      routes: {
+        '/home': (_) => const HomeScreen(),
+        '/login': (_) => const PantallaAutenticacion(),
+      },
     );
   }
 }
@@ -47,14 +59,14 @@ class PortalAutenticacion extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // Cargando estado de autenticación
+        // Cargando estado inicial de auth
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // Si NO hay usuario → Login
+        // Si no hay usuario -> login
         if (!snapshot.hasData) {
           return const PantallaAutenticacion();
         }
@@ -65,4 +77,3 @@ class PortalAutenticacion extends StatelessWidget {
     );
   }
 }
-
