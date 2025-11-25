@@ -33,7 +33,8 @@ import {
   shieldCheckmarkOutline,
   pawOutline,
   calendarOutline,
-  heartOutline
+  heartOutline,
+  briefcaseOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -98,6 +99,19 @@ import {
                   <ion-label>Proveedor</ion-label>
                 </ion-segment-button>
               </ion-segment>
+              <div class="user-type-helper" [class.provider]="userType === 'provider'">
+                <ion-icon [name]="userType === 'provider' ? 'briefcase-outline' : 'paw-outline'"></ion-icon>
+                <div>
+                  <p class="pill-title">{{ userType === 'provider' ? 'Ingresar como proveedor' : 'Ingresar como cliente' }}</p>
+                  <p class="pill-subtitle">
+                    {{
+                      userType === 'provider'
+                        ? 'Administra tus servicios, agenda con clientes y destaca tu negocio.'
+                        : 'Guarda el perfil de tus mascotas, agenda y descubre profesionales cercanos.'
+                    }}
+                  </p>
+                </div>
+              </div>
             </div>
 
             <ion-card class="auth-card glass-card">
@@ -255,8 +269,10 @@ import {
       display: flex;
       flex-direction: row;
       align-items: stretch;
-      padding: 3rem 1.5rem;
+      padding: 3rem 1.5rem 4rem;
       gap: 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     .promo-panel {
@@ -375,6 +391,38 @@ import {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
+    }
+
+    .user-type-helper {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.85rem 1rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .user-type-helper.provider {
+      background: rgba(79, 109, 255, 0.12);
+      border-color: rgba(79, 109, 255, 0.35);
+    }
+
+    .user-type-helper ion-icon {
+      color: #53d0ff;
+      font-size: 1.4rem;
+    }
+
+    .pill-title {
+      margin: 0;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .pill-subtitle {
+      margin: 0.1rem 0 0 0;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 0.9rem;
     }
 
     .user-type-label {
@@ -509,6 +557,7 @@ import {
       .auth-wrapper {
         flex-direction: column;
         padding-top: 4rem;
+        padding-bottom: 3rem;
       }
 
       .promo-panel,
@@ -518,16 +567,60 @@ import {
 
       .form-shell {
         margin: 0 auto;
+        max-width: 520px;
       }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
+      .auth-content {
+        --background: linear-gradient(160deg, #0b172d 0%, #133050 60%, #1c3b64 100%);
+      }
+
+      .auth-wrapper {
+        padding: 2.5rem 1rem 3rem;
+      }
+
+      .form-header h2 {
+        font-size: 1.7rem;
+      }
+
+      .promo-panel {
+        gap: 1rem;
+      }
+
+      .glass-card {
+        box-shadow: 0 12px 32px rgba(5, 15, 35, 0.38);
+      }
+    }
+
+    @media (max-width: 576px) {
+      .auth-wrapper {
+        padding: 2rem 0.75rem 2.5rem;
+      }
+
+      .form-shell {
+        max-width: none;
+      }
+
+      .promo-chips {
+        gap: 0.5rem;
+      }
+
       .highlight-grid {
         grid-template-columns: 1fr;
       }
 
-      .form-shell {
-        max-width: 100%;
+      .form-toggle {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .toggle-btn {
+        width: 100%;
+      }
+
+      .user-type-helper {
+        align-items: flex-start;
       }
     }
   `],
@@ -586,7 +679,8 @@ export class AuthPage {
       shieldCheckmarkOutline,
       pawOutline,
       calendarOutline,
-      heartOutline
+      heartOutline,
+      briefcaseOutline
     });
 
     this.authForm = this.fb.group({

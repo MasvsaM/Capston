@@ -5,9 +5,17 @@ import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideAuth, getAuth } from '@angular/fire/auth';
+import {
+  browserLocalPersistence,
+  browserPopupRedirectResolver,
+  initializeAuth,
+  provideAuth,
+  indexedDBLocalPersistence
+} from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideStorage, getStorage } from '@angular/fire/storage';
+import { Capacitor } from '@capacitor/core';
+import { getApp, getApps, initializeApp as initializeFirebaseApp } from 'firebase/app';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -24,7 +32,21 @@ import { GuardianAutenticacion, GuardianRol } from '@nucleo/guardianes';
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAuth(() => getAuth()),
+    provideAuth(() => {
+      const app = getApps().length ? getApp() : initializeFirebaseApp(environment.firebase);
+
+      if (Capacitor.isNativePlatform()) {
+        return initializeAuth(app, {
+          persistence: indexedDBLocalPersistence,
+          popupRedirectResolver: browserPopupRedirectResolver
+        });
+      }
+
+      return initializeAuth(app, {
+        persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+        popupRedirectResolver: browserPopupRedirectResolver
+      });
+    }),
     provideFirestore(() => getFirestore()),
     provideStorage(() => getStorage()),
     GuardianAutenticacion,
