@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,56 +10,58 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _isLoading = false;
-  bool _passwordVisible = false;
 
-  FirebaseAuth get _auth => FirebaseAuth.instance;
-
-  void _showMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
-    );
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
-  // 🔐 Login con email/contraseña
-  Future<void> _loginWithEmail() async {
+  Future<void> _signInEmailPassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
     setState(() => _isLoading = true);
 
     try {
-      await _auth.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
       if (!mounted) return;
-      // AuthGate se encarga de mandarte a Home, pero esto asegura la navegación
+
       Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      String msg = 'Error al iniciar sesión';
+      String message = 'Ocurrió un error al iniciar sesión';
 
-      switch (e.code) {
-        case 'user-not-found':
-          msg = 'Usuario no encontrado';
-          break;
-        case 'wrong-password':
-          msg = 'Contraseña incorrecta';
-          break;
-        case 'invalid-email':
-          msg = 'Correo inválido';
-          break;
-        case 'user-disabled':
-          msg = 'Esta cuenta está deshabilitada';
-          break;
+      if (e.code == 'user-not-found') {
+        message = 'No existe un usuario con ese correo';
+      } else if (e.code == 'wrong-password') {
+        message = 'Contraseña incorrecta';
+      } else if (e.code == 'invalid-email') {
+        message = 'Correo inválido';
       }
 
-      _showMessage(msg);
-    } catch (e) {
-      if (!mounted) return;
-      _showMessage('Error inesperado: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error inesperado, inténtalo nuevamente'),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -68,259 +69,204 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // 🔐 Login con Google
-  Future<void> _loginWithGoogle() async {
+  Future<void> _resetPassword() async {
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty || !email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ingresa un correo válido para recuperar tu cuenta'),
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
-      final googleUser = await GoogleSignIn().signIn();
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 
-      // El usuario canceló el flujo
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Te enviamos un correo para restablecer la contraseña'),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      String message = 'No se pudo enviar el correo';
+
+      if (e.code == 'user-not-found') {
+        message = 'No existe un usuario con ese correo';
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error inesperado, inténtalo nuevamente'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      // Usuario canceló el flujo
       if (googleUser == null) {
-        if (!mounted) return;
-        _showMessage('Inicio de sesión con Google cancelado');
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
         return;
       }
 
-      final googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      await _auth.signInWithCredential(credential);
+      await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (!mounted) return;
+
       Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      _showMessage('Error con Google: ${e.message}');
-    } catch (e) {
-      if (!mounted) return;
-      _showMessage('Error inesperado con Google: $e');
-    } finally {
       if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  // 🔐 Login con Facebook
-  Future<void> _loginWithFacebook() async {
-    setState(() => _isLoading = true);
-
-    try {
-      final result = await FacebookAuth.instance.login(
-        permissions: ['email'],
-      );
-
-      if (result.status == LoginStatus.cancelled) {
-        if (!mounted) return;
-        _showMessage('Inicio de sesión con Facebook cancelado');
-        return;
-      }
-
-      if (result.status == LoginStatus.failed) {
-        if (!mounted) return;
-        _showMessage('Error con Facebook: ${result.message}');
-        return;
-      }
-
-      final accessToken = result.accessToken;
-      if (accessToken == null) {
-        if (!mounted) return;
-        _showMessage('No se recibió el token de Facebook');
-        return;
-      }
-
-      final credential =
-          FacebookAuthProvider.credential(accessToken.tokenString);
-
-      await _auth.signInWithCredential(credential);
-
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      _showMessage('Error con Facebook: ${e.message}');
-    } catch (e) {
-      if (!mounted) return;
-      _showMessage('Error inesperado con Facebook: $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  // 🔁 Recuperar contraseña (reset por correo)
-  Future<void> _resetPasswordDialog() async {
-    final controller = TextEditingController(text: _emailController.text);
-
-    await showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          title: const Text('Recuperar contraseña'),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: 'Correo electrónico',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final email = controller.text.trim();
-                if (email.isEmpty) {
-                  _showMessage('Ingresa un correo válido');
-                  return;
-                }
-
-                try {
-                  await _auth.sendPasswordResetEmail(email: email);
-                  if (!mounted) return;
-                  Navigator.of(ctx).pop();
-                  _showMessage(
-                    'Te enviamos un correo para restablecer tu contraseña',
-                  );
-                } on FirebaseAuthException catch (e) {
-                  _showMessage('Error al enviar correo: ${e.message}');
-                } catch (e) {
-                  _showMessage('Error inesperado: $e');
-                }
-              },
-              child: const Text('Enviar'),
-            ),
-          ],
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error con Google: ${e.message}')),
         );
-      },
-    );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo iniciar sesión con Google'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
-
   @override
   Widget build(BuildContext context) {
-    final isBusy = _isLoading;
-
     return Scaffold(
-      body: SafeArea(
+      body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 40),
-              const Text(
-                'Iniciar sesión',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // 📧 Email
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Correo electrónico',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 🔑 Contraseña con icono de ver/ocultar
-              TextField(
-                controller: _passwordController,
-                obscureText: !_passwordVisible,
-                decoration: InputDecoration(
-                  labelText: 'Contraseña',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _passwordVisible
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _passwordVisible = !_passwordVisible;
-                      });
-                    },
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Iniciar sesión',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-
-              // ¿Olvidaste tu contraseña?
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: isBusy ? null : _resetPasswordDialog,
-                  child: const Text('¿Olvidaste tu contraseña?'),
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Correo electrónico',
+                    prefixIcon: Icon(Icons.email_outlined),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Ingresa tu correo';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Correo no válido';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-              const SizedBox(height: 16),
-
-              // Botón principal de login
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: isBusy ? null : _loginWithEmail,
-                  child: isBusy
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Entrar'),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Contraseña',
+                    prefixIcon: Icon(Icons.lock_outline),
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ingresa tu contraseña';
+                    }
+                    if (value.length < 6) {
+                      return 'Mínimo 6 caracteres';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-              const SizedBox(height: 24),
-
-              // Separador
-              Row(
-                children: const [
-                  Expanded(child: Divider()),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text('o continúa con'),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _isLoading ? null : _resetPassword,
+                    child: const Text('¿Olvidaste tu contraseña?'),
                   ),
-                  Expanded(child: Divider()),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Botones Google & Facebook
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: isBusy ? null : _loginWithGoogle,
-                      icon: const Icon(Icons.g_mobiledata),
-                      label: const Text('Google'),
-                    ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _signInEmailPassword,
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Entrar'),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: isBusy ? null : _loginWithFacebook,
-                      icon: const Icon(Icons.facebook),
-                      label: const Text('Facebook'),
-                    ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: _isLoading ? null : _signInWithGoogle,
+                    icon: const Icon(Icons.login),
+                    label: const Text('Continuar con Google'),
                   ),
-                ],
-              ),
-
-              const SizedBox(height: 40),
-            ],
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                  child: const Text('Crear cuenta nueva'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

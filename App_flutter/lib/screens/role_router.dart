@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'client_home.dart';
 import 'provider_home.dart';
@@ -9,29 +9,35 @@ import 'admin_home.dart';
 class RoleRouter extends StatelessWidget {
   const RoleRouter({super.key});
 
-  Future<String?> _getRole() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    final doc =
-        await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    return doc.data()?['role'] as String?;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: _getRole(),
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // Si no hay usuario, no mostramos nada (AuthGate decide)
+      return const SizedBox.shrink();
+    }
+
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
         }
 
-        final role = snapshot.data;
-        if (role == 'cliente') return const ClientHome();
-        if (role == 'proveedor') return const ProviderHome();
-        // Si en Firestore le pones role = 'admin' a alguien, vendrá acá:
-        return const AdminHome();
+        final data = snapshot.data?.data() ?? {};
+        final role = (data['role'] ?? 'client') as String;
+
+        if (role == 'admin') {
+          return const AdminHomeScreen();
+        } else if (role == 'provider') {
+          return const ProviderHomeScreen();
+        } else {
+          // Cliente
+          return const ClientHomeScreen();
+        }
       },
     );
   }

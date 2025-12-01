@@ -1,199 +1,250 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'provider_requests_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ProviderHome extends StatefulWidget {
-  const ProviderHome({super.key});
+import '../models/service_blocks.dart';
+import 'provider_home.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<ProviderHome> createState() => _ProviderHomeState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _ProviderHomeState extends State<ProviderHome> {
-  String get uid => FirebaseAuth.instance.currentUser!.uid;
+class _HomeScreenState extends State<HomeScreen> {
+  bool _loading = true;
+  DocumentSnapshot<Map<String, dynamic>>? _userDoc;
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> _servicesStream() {
-    return FirebaseFirestore.instance
-        .collection('services')
-        .where('providerId', isEqualTo: uid)
-        .orderBy('createdAt', descending: false)
-        .snapshots();
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
   }
 
-  Future<void> _openServiceDialog({
-    DocumentSnapshot<Map<String, dynamic>>? service,
-  }) async {
-    final titleCtrl = TextEditingController(
-      text: service?.data()?['title'] ?? '',
-    );
-    final descCtrl = TextEditingController(
-      text: service?.data()?['description'] ?? '',
-    );
-    final typeCtrl = TextEditingController(
-      text: service?.data()?['type'] ?? '',
-    );
-    final priceCtrl = TextEditingController(
-      text: service?.data()?['price']?.toString() ?? '',
-    );
+  Future<void> _loadUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      setState(() => _loading = false);
+      return;
+    }
 
-    final isEdit = service != null;
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
 
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(isEdit ? 'Editar servicio' : 'Nuevo servicio'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleCtrl,
-                  decoration: const InputDecoration(labelText: 'Título'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: descCtrl,
-                  decoration: const InputDecoration(labelText: 'Descripción'),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: typeCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Tipo (peluquería, paseo, veterinaria, etc.)',
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: priceCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Precio (CLP)'),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final title = titleCtrl.text.trim();
-                if (title.isEmpty) return;
-
-                final price = int.tryParse(priceCtrl.text.trim());
-
-                final data = <String, dynamic>{
-                  'providerId': uid,
-                  'title': title,
-                  'description': descCtrl.text.trim(),
-                  'type': typeCtrl.text.trim(),
-                  'price': price,
-                  'isActive': true,
-                  'updatedAt': FieldValue.serverTimestamp(),
-                };
-
-                final servicesRef = FirebaseFirestore.instance.collection(
-                  'services',
-                );
-
-                if (isEdit) {
-                  await servicesRef.doc(service.id).update(data);
-                } else {
-                  await servicesRef.add({
-                    ...data,
-                    'createdAt': FieldValue.serverTimestamp(),
-                  });
-                }
-
-                if (context.mounted) Navigator.pop(context);
-              },
-              child: Text(isEdit ? 'Guardar' : 'Crear'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _deleteService(String id) async {
-    await FirebaseFirestore.instance.collection('services').doc(id).delete();
+      if (!mounted) return;
+      setState(() {
+        _userDoc = doc;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se pudo cargar tu perfil: $e')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final user = FirebaseAuth.instance.currentUser;
+    final data = _userDoc?.data() ?? {};
+    final role = (data['role'] as String?) ?? 'client';
+
+    final displayName = user?.displayName ??
+        (data['name'] as String?) ??
+        user?.email ??
+        'Usuario';
+
+    if (role == 'provider') {
+      return ProviderOverviewHome(
+        userName: displayName,
+        userData: data,
+      );
+    }
+
+    // Inicio genérico para clientes / otros roles
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MarketPet - Mis servicios'),
-        actions: [
-          IconButton(
-            tooltip: 'Solicitudes',
-            icon: const Icon(Icons.mail_outline),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const ProviderRequestsScreen(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => FirebaseAuth.instance.signOut(),
-          ),
-        ],
+        title: const Text('Inicio'),
       ),
+      body: Center(
+        child: Text(
+          'Hola, $displayName',
+          style: const TextStyle(fontSize: 20),
+        ),
+      ),
+    );
+  }
+}
 
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _servicesStream(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+/// ---------- INICIO ESPECIAL PARA PROVEEDOR ----------
+class ProviderOverviewHome extends StatelessWidget {
+  final String userName;
+  final Map<String, dynamic> userData;
 
-          final docs = snapshot.data?.docs ?? [];
+  const ProviderOverviewHome({
+    super.key,
+    required this.userName,
+    required this.userData,
+  });
 
-          if (docs.isEmpty) {
-            return const Center(
-              child: Text('Aún no tienes servicios publicados 💈'),
-            );
-          }
+  @override
+  Widget build(BuildContext context) {
+    final businessName = (userData['businessName'] as String?) ?? '';
+    final approvalStatus = (userData['approvalStatus'] as String?) ?? 'pending';
+    final openTime = (userData['openTime'] as String?) ?? '';
+    final closeTime = (userData['closeTime'] as String?) ?? '';
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              final service = docs[index];
-              final data = service.data();
+    final rawConfigs = userData['servicesConfig'] as List<dynamic>? ?? [];
+    final enabledServiceIds = <String>{};
 
-              return Card(
-                child: ListTile(
-                  title: Text(data['title'] ?? ''),
-                  subtitle: Text(
-                    [
-                      if ((data['type'] ?? '').toString().isNotEmpty)
-                        'Tipo: ${data['type']}',
-                      if (data['price'] != null) 'Precio: \$${data['price']}',
-                    ].join(' • '),
-                  ),
-                  onTap: () => _openServiceDialog(service: service),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.redAccent),
-                    onPressed: () => _deleteService(service.id),
-                  ),
-                ),
-              );
-            },
-          );
+    for (final item in rawConfigs) {
+      if (item is Map) {
+        final map = Map<String, dynamic>.from(item as Map);
+        final enabled = map['enabled'] as bool? ?? false;
+        final id = map['serviceId'] as String? ?? '';
+        if (enabled && id.isNotEmpty) {
+          enabledServiceIds.add(id);
+        }
+      }
+    }
+
+    final enabledBlocks = kServiceBlocks
+        .where((b) => enabledServiceIds.contains(b.id))
+        .toList();
+
+    final isApproved = approvalStatus == 'approved';
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Inicio'),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // el HomeScreen se recarga solo al reconstruirse,
+          // aquí solo hacemos una pequeña pausa para el efecto
+          await Future<void>.delayed(const Duration(milliseconds: 400));
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openServiceDialog(),
-        child: const Icon(Icons.add),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          children: [
+            // Saludo principal
+            Text(
+              'Hola, $userName',
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              isApproved
+                  ? 'Tu perfil de proveedor está aprobado.'
+                  : 'Tu perfil de proveedor está en revisión.',
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 24),
+
+            // Resumen del negocio
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 24,
+                      child: Icon(Icons.storefront),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            businessName.isEmpty
+                                ? 'Negocio sin nombre'
+                                : businessName,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (openTime.isNotEmpty || closeTime.isNotEmpty)
+                            Text(
+                              'Horario: '
+                              '${openTime.isNotEmpty ? openTime : '--:--'}'
+                              ' – '
+                              '${closeTime.isNotEmpty ? closeTime : '--:--'}',
+                              style: const TextStyle(color: Colors.black54),
+                            ),
+                          Text(
+                            'Servicios activos: ${enabledBlocks.length}',
+                            style: const TextStyle(color: Colors.black54),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Lista de servicios principales
+            const Text(
+              'Servicios que ofreces',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+
+            if (enabledBlocks.isEmpty)
+              const Text(
+                'Aún no tienes servicios configurados.\n'
+                'Puedes configurarlos desde el panel de proveedor.',
+              )
+            else
+              ...enabledBlocks.map(
+                (block) => ListTile(
+                  leading: const Icon(Icons.pets),
+                  title: Text(block.name),
+                  subtitle: Text(block.description),
+                ),
+              ),
+
+            const SizedBox(height: 24),
+
+            // Botón para ir al panel completo (con navbar)
+            Center(
+              child: FilledButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProviderHomeScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.dashboard),
+                label: const Text('Ir a mi panel de proveedor'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
