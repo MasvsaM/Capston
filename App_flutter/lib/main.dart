@@ -4,17 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'firebase_options.dart';
 
-// Pantallas de auth
+// Auth
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 
-// Home general (cliente / proveedor)
-import 'screens/home_screen.dart' show HomeScreen;
-
-// Homes específicos (si quieres navegarlos por rutas)
-import 'screens/admin_home.dart' show AdminHome;
-import 'screens/client_home.dart' show ClientHome;
-import 'screens/provider_home.dart' show ProviderHomeScreen;
+// Home genérico (decide qué mostrar según rol)
+import 'screens/home_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,17 +31,13 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: Colors.teal,
       ),
-      // Decide login / home según estado de Firebase Auth
       home: const AuthGate(),
       routes: {
         '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const HomeScreen(),
-
-        // Estas rutas son opcionales, pero las dejo por si las usas en otro lado:
-        '/client': (_) => const ClientHome(),
-        '/admin': (_) => const AdminHome(),
-        '/provider': (_) => const ProviderHomeScreen(),
+        // 🔴 IMPORTANTE:
+        // Aquí NO debe quedar nada de '/admin' ni '/provider'
       },
     );
   }
@@ -60,19 +51,16 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // Cargando estado inicial
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // Sin usuario -> login
         if (!snapshot.hasData) {
           return const LoginScreen();
         }
 
-        // Con usuario -> nuevo HomeScreen (que ya sabe si es cliente / proveedor)
         return const HomeScreen();
       },
     );
