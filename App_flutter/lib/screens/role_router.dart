@@ -2,109 +2,137 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Ajusta estos imports si tus rutas son con 'package:app_flutter/...'
 import 'login_screen.dart';
-import 'home_screen.dart';
+import 'admin_home.dart';
 import 'provider_home.dart';
+import 'client_home.dart';
 
-
+/// Decide a qué home mandar según el rol:
+/// admin / provider / client
 class RoleRouter extends StatelessWidget {
-  const RoleRouter({super.key});
+  RoleRouter({super.key});
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
-    // 1) Escucha el estado de autenticación
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, userSnap) {
-        // Cargando auth
-        if (userSnap.connectionState == ConnectionState.waiting) {
+      stream: _auth.authStateChanges(),
+      builder: (context, authSnap) {
+        if (authSnap.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // No logueado → Login
-        final user = userSnap.data;
+        final user = authSnap.data;
+
+        // Sin sesión => login
         if (user == null) {
           return LoginScreen();
         }
 
-        // 2) Ya logueado → escucha el documento de /users/{uid}
-        return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance
-              .collection('users')
-              .doc(user.uid)
-              .snapshots(),
-          builder: (context, docSnap) {
-            if (docSnap.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
+        final uid = user.uid;
 
-            if (docSnap.hasError) {
+        // Leer doc en users/{uid}
+        return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          stream: _db.collection('users').doc(uid).snapshots(),
+          builder: (context, userSnap) {
+            if (userSnap.hasError) {
               return Scaffold(
                 body: Center(
-                  child: Text('Error cargando perfil: ${docSnap.error}'),
+                  child: Text(
+                    'Error cargando perfil: ${userSnap.error}',
+                  ),
                 ),
               );
             }
 
-            if (!docSnap.hasData || !docSnap.data!.exists) {
-              // Sin doc de usuario → por ahora mandamos al Home genérico
-              return HomeScreen(); // SIN const
+            if (!userSnap.hasData || userSnap.data!.data() == null) {
+              // Todavía no se ha creado el documento
+              return const Scaffold(
+                body: Center(
+                  child: Text(
+                    'Estamos configurando tu perfil...\n'
+                    'Intenta nuevamente en unos instantes.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
             }
 
-            final data = docSnap.data!.data() ?? {};
-
-            final role =
-                (data['role'] as String? ?? 'client').toLowerCase().trim();
+            final data = userSnap.data!.data()!;
+            final role = (data['role'] as String?) ?? 'client';
             final approvalStatus =
-                (data['approvalStatus'] as String? ?? 'approved')
-                    .toLowerCase()
-                    .trim();
+                (data['approvalStatus'] as String?) ?? 'pending';
 
-            // 2.a) Casos especiales para proveedores
-            if (role == 'provider') {
-              if (approvalStatus == 'pending') {
-                return Scaffold(
-                  appBar: AppBar(title: const Text('Revisión de perfil')),
-                  body: const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: Text(
-                        'Tu perfil de proveedor está en revisión.\n'
-                        'Te avisaremos cuando sea aprobado.',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                );
-              }
-
-              if (approvalStatus == 'rejected') {
-                return Scaffold(
-                  appBar: AppBar(title: const Text('Perfil rechazado')),
-                  body: const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: Text(
-                        'Tu perfil de proveedor fue rechazado.\n'
-                        'Revisa la información ingresada o contáctanos '
-                        'para más detalles.',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                );
-              }
-
-              // approved → panel de proveedor (con navbar y todo)
-              return ProviderHomeScreen(); 
+            // ---- ADMIN ----
+            if (role == 'admin') {
+              // Ojo: aquí asumimos que en admin_home.dart tienes
+              // class AdminHomeScreen extends StatelessWidget ...
+              return AdminHomeScreen();
             }
 
-            // 2.b) Admin y client → usan el Home actual
-            return HomeScreen(); 
+            // ---- PROVEEDOR ----
+            if (role == 'provider') {
+              if (approvalStatus != 'approved') {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Perfil proveedor'),
+                  ),
+                  body: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Tu perfil de proveedor aún no está aprobado.',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text('Estado actual: $approvalStatus'),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Cuando sea aprobado podrás acceder al panel '
+                          'para gestionar tus servicios.',
+                        ),
+                        const Spacer(),
+                        Center(
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              await _auth.signOut();
+                              if (!context.mounted) return;
+                              Navigator.of(context)
+                                  .pushNamedAndRemoveUntil(
+                                '/login',
+                                (route) => false,
+                              );
+                            },
+                            icon: const Icon(Icons.logout),
+                            label: const Text('Cerrar sesión'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              // Proveedor aprobado
+              // En provider_home.dart debe existir:
+              // class ProviderHomeScreen extends StatefulWidget ...
+              return ProviderHomeScreen();
+            }
+
+            // ---- CLIENTE (default) ----
+            // En client_home.dart debe existir:
+            // class ClientHomeScreen extends StatefulWidget ...
+            return ClientHomeScreen();
           },
         );
       },

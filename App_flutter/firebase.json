@@ -1,1 +1,23 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"marketpet-app","configurations":{"android":"1:17187771784:android:95d9b69b0e80084bc6d63d","ios":"1:17187771784:ios:1c4e2b8274442b40c6d63d","web":"1:17187771784:web:9926a157cf9e0f80c6d63d"}}},"android":{"default":{"projectId":"marketpet-app","appId":"1:17187771784:android:95d9b69b0e80084bc6d63d","fileOutput":"android/app/google-services.json"}}}}}
+{
+    "flutter": {
+        "platforms": {
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "marketpet-app",
+                    "configurations": {
+                        "android": "1:17187771784:android:95d9b69b0e80084bc6d63d",
+                        "ios": "1:17187771784:ios:1c4e2b8274442b40c6d63d",
+                        "web": "1:17187771784:web:9926a157cf9e0f80c6d63d"
+                    }
+                }
+            },
+            "android": {
+                "default": {
+                    "projectId": "marketpet-app",
+                    "appId": "1:17187771784:android:95d9b69b0e80084bc6d63d",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            }
+        }
+    }
+}
